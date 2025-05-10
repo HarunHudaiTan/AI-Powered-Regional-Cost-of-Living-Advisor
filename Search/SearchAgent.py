@@ -1,5 +1,3 @@
-import gradio
-from fontTools.feaLib import location
 from google import genai
 from google.genai import types
 import json
@@ -50,8 +48,8 @@ def search_agent(query):
     response=chat.send_message(query)
     return response.text
 
-from Keyword_Agent import parse_keyword_agent
-from Search import search,parse_search_results
+from Search.Keyword_Agent import parse_keyword_agent
+from Search.Search import parse_search_results
 
 def response(message,history):
     keyword= parse_keyword_agent(message["text"])
@@ -63,7 +61,7 @@ def response(message,history):
 
 
 import gradio as gr
-from Search import search
+from Search.Search import search
 
 
 button = gr.Button("Change location")
