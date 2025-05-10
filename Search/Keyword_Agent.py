@@ -1,7 +1,7 @@
 from fontTools.ttLib.tables.ttProgram import instructions
 from google import genai
 from google.genai import types
-client = genai.Client(api_key="AIzaSyBU3Y7wJ4RtouBAjnV7a2lcorAm4UTrZVE")
+client = genai.Client(api_key="")
 
 system_instructions="""
 System Prompt for Keyword Extraction Agent
@@ -42,6 +42,7 @@ def parse_keyword_agent(prompt):
     model="gemini-2.0-flash",
     config=types.GenerateContentConfig(
         system_instruction=system_instructions,
+        response_mime_type="application/json",
      )
     )
     response = chat.send_message(prompt)

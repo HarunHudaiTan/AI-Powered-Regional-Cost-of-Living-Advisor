@@ -18,9 +18,6 @@ def search(keywords,url = "https://google.serper.dev/search"):
 
   return response.json()
 
-
-
-
 def parse_search_results(results):
   entries = []
   for result in results.get("organic", []):
