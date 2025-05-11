@@ -1,12 +1,12 @@
-from google import genai
-from google.genai import types
 import json
+import os
 
-client = genai.Client(api_key='AIzaSyAIBcAT03kB3RWGyLjzkfaIfDXmNxsCCD8')
+from Agent import Agent
 
-system_instructions = """
-
-You are a Real Estate Advisor AI. Your purpose is to provide structured information about real estate properties based on a user's query.
+class RealEstateAgent(Agent):
+    system_instruction = """
+    
+    You are a Real Estate Advisor AI. Your purpose is to provide structured information about real estate properties based on a user's query.
 
 You will analyze the user's request and respond with a JSON object conforming to the following schema:
 
@@ -84,20 +84,80 @@ Acceptable JSON Output (example - you'll fill this based on the provided search 
   "summary": "Found 2 apartments for sale in Kadıköy, Istanbul with at least 2 bedrooms and a balcony.",
   "number_of_result": "2"
 }
+    
+    
+    
+    """
 
-"""
+    def __init__(self):
 
-def real_estate_agent(query):
-    real_estate_response = client.models.generate_content(
-        contents=query,
-        model = "gemini-2.0-flash",
-        config = types.GenerateContentConfig(
-            system_instruction= system_instructions,
-        )
-    )
+        super().__init__(self.system_instruction, response_mime_type="application/json")
 
-    return real_estate_response
+        self.real_estate_agent = Agent(self.system_instruction, response_mime_type="application/json")
 
-#Query'yi Harun'un Gradio Chat'ten aldım, ona da Where can i live in Ankara with 20000 liras yazmıştım direkt implementation yapamdaım response'u gradiodan herhalde
+    def read_json_file(self, folder_path, file_name):
+        """
+        Reads a JSON file from the specified folder and returns its contents.
 
-print(real_estate_agent("You can find apartments for rent within your 20,000 TL budget in Ankara in several locations:Mamak: You can find 3+1 apartments for rent in Mamak, specifically in Saimekadın Mahallesi (Source: https://www.sahibinden.com/en/for-rent-flat/ankara/developer). Additionally, there are 100 square meter apartments for rent in Mamak (Source: https://www.hepsiemlak.com/en/ankara-kiralik/daire).Etimesgut/Eryaman: You can find 2+1 apartments for rent in Eryaman, Etimesgut (Source: https://www.sahibinden.com/en/for-rent-flat/ankara-etimesgut-eryaman).Çankaya: A 69 square meters 2+1 apartment for rent is available in Çankaya (Source: https://www.zingat.com/en/emekte-kiralik-milli-kutuphane-yakini-2-1-merkezi-aderden-5284014i).When searching for apartments, you can check real estate websites such as sahibinden.com, hepsiemlak.com, and zingat.com (Sources: https://www.sahibinden.com/en/for-rent-flat/ankara/developer, https://www.hepsiemlak.com/en/ankara-kiralik/daire, https://www.zingat.com/en/ankara-for-rent-apartment).").text)
+        Parameters:
+            folder_path (str): The path to the folder containing the JSON file.
+            file_name (str): The name of the JSON file (with .json extension).
+
+        Returns:
+            dict or list: Parsed JSON content.
+        """
+        file_path = os.path.join(folder_path, file_name)
+
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+
+        return data
+
+    def response_from_json(self, folder_path, file_name):
+        """
+        Reads a JSON file and uses its content as the prompt for the agent.
+
+        Parameters:
+            folder_path (str): Path to the folder containing the JSON file.
+            file_name (str): Name of the JSON file.
+
+        Returns:
+            str: The response from the agent, based on the JSON content.
+        """
+        json_data = self.read_json_file(folder_path, file_name)
+
+        # Convert the JSON data to a string that can be used as a prompt.  Handle different types.
+        if isinstance(json_data, dict) or isinstance(json_data, list):
+            prompt = json.dumps(json_data) # Convert to string to send to the model.
+        else:
+            prompt = str(json_data)
+
+        return self.response(prompt)
+
+
+
+
+if __name__ == '__main__':
+    # Set GOOGLE_API_KEY in environment variables
+
+    real_estate_agent = RealEstateAgent()
+    folder_path = "./Parsed_Docs"  # Replace with the actual folder path
+    file_name = "temp_crawl_result.json"  # Replace with the actual file name
+
+    # Create a dummy property.json file if one doesn't exist:
+    if not os.path.exists(os.path.join(folder_path, file_name)):
+        os.makedirs(folder_path, exist_ok=True)
+        with open(os.path.join(folder_path, file_name), "w") as f:
+            json.dump({"address": "123 Main St", "bedrooms": 3, "bathrooms": 2, "price": 500000}, f)
+
+
+    try:
+        response = real_estate_agent.response_from_json(folder_path, file_name)
+        print(response)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        print("Make sure the GOOGLE_API_KEY is set as an environment variable.")
+        print("Ensure you have a 'data' folder with a 'property.json' file (or modify the folder_path and file_name variables accordingly)")
+
+
+
