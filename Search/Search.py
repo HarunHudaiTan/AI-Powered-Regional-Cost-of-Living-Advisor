@@ -20,12 +20,14 @@ def search(keywords,url = "https://google.serper.dev/search"):
 
 def parse_search_results(results):
   entries = []
+  links=[]
   for result in results.get("organic", []):
     title=result.get("title")
     link=result.get("link")
     snippet=result.get("snippet")
     if title and link and snippet:
       entries.append((title, link, snippet ))
+      links.append(link)
   return entries
 
 
