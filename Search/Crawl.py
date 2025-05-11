@@ -20,17 +20,17 @@ async def main():
 
     async with AsyncWebCrawler(config=browser_config) as crawler:
         result = await crawler.arun(
-            url="https://marketfiyati.org.tr/kategori/Meyve%20ve%20Sebze",
+            url="https://www.hepsiemlak.com/ankara-kiralik?gad_source=1&gad_campaignid=21208361490&gbraid=0AAAAADP4NMaVAz5nTXPYOv_8pFXRLoRlc&gclid=Cj0KCQjwlYHBBhD9ARIsALRu09qo7fLBunKizw_i4h7ot8d3QFsgSs2DUgH0uTt_vxE64jssjYpqolIaAnDVEALw_wcB",
             config=run_config
         )
 
         if result.success:
             # Print clean content
             # First 500 chars
-
-            with open("temp_crawl_result.md", "w", encoding="utf-8") as f:
-                f.write(result.markdown)
-            process_with_docling("temp_crawl_result.md")
+            print(result.cleaned_html)
+            # with open("temp_crawl_result.md", "w", encoding="utf-8") as f:
+            #     f.write(result.markdown.raw_markdown)
+            # process_with_docling("temp_crawl_result.md")
             # Process images
             for image in result.media["images"]:
                 print(f"Found image: {image['src']}")
@@ -43,13 +43,13 @@ async def main():
             print(f"Crawl failed: {result.error_message}")
 
 
-from docling.document_converter import DocumentConverter
-
-
-def process_with_docling(file_path):
-    converter = DocumentConverter()
-    result = converter.convert(file_path)
-    print(result.document.export_to_dict())  # output: "### Docling Technical Report[...]"
+# from docling.document_converter import DocumentConverter
+#
+#
+# def process_with_docling(file_path):
+#     converter = DocumentConverter()
+#     result = converter.convert(file_path)
+#     print(result.document.export_to_dict())  # output: "### Docling Technical Report[...]"
 
 if __name__ == "__main__":
     asyncio.run(main())
