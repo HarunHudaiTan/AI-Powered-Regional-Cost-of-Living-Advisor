@@ -20,18 +20,22 @@ async def main():
 
     async with AsyncWebCrawler(config=browser_config) as crawler:
         result = await crawler.arun(
-            url="https://www.hepsiemlak.com/ankara-kiralik?gad_source=1&gad_campaignid=21208361490&gbraid=0AAAAADP4NMaVAz5nTXPYOv_8pFXRLoRlc&gclid=Cj0KCQjwlYHBBhD9ARIsALRu09qo7fLBunKizw_i4h7ot8d3QFsgSs2DUgH0uTt_vxE64jssjYpqolIaAnDVEALw_wcB",
+            url="https://www.basarisiralamalari.com/sanko-universitesi-egitim-ucretleri-2024-ve-burslari/",
             config=run_config
         )
 
         if result.success:
             # Print clean content
             # First 500 chars
-            print(result.cleaned_html)
-            # with open("temp_crawl_result.md", "w", encoding="utf-8") as f:
-            #     f.write(result.markdown.raw_markdown)
-            # process_with_docling("temp_crawl_result.md")
-            # Process images
+
+            # from University_fee_parser import parse_university_fees,save_to_json
+            # data=parse_university_fees(result.markdown)
+            # save_to_json(data,"university_fees.json")
+
+            # with open("temp_crawl_result2.html", "w") as f:
+            #     f.write(result.cleaned_html)
+            #     # process_with_docling("temp_crawl_result.md")
+
             for image in result.media["images"]:
                 print(f"Found image: {image['src']}")
 
@@ -44,12 +48,16 @@ async def main():
 
 
 # from docling.document_converter import DocumentConverter
-#
-#
+
 # def process_with_docling(file_path):
 #     converter = DocumentConverter()
 #     result = converter.convert(file_path)
 #     print(result.document.export_to_dict())  # output: "### Docling Technical Report[...]"
+
+
+
+
+
 
 if __name__ == "__main__":
     asyncio.run(main())
