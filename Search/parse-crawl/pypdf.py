@@ -1,5 +1,7 @@
 from PyPDF2 import PdfReader
 
+
+
 reader = PdfReader("example.pdf")
 
 for i in range(0,len(reader.pages)) :
