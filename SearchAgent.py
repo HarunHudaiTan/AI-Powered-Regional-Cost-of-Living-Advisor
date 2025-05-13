@@ -5,6 +5,8 @@ from Keyword_Agent import parse_keyword_agent
 from Search import parse_search_results
 from Search import search
 import os
+from url_extractor import extract_and_save_urls
+
 class SearchAgent(Agent):
     system_instructions = """
        You are a helpful search assistant. Your sole goal is
@@ -60,6 +62,13 @@ class SearchAgent(Agent):
         parsed_results=parse_search_results(results)
         string_parsed_results=json.dumps(parsed_results)
         response= self.search_agent.response("User query" + message["text"] + "Google search results" + string_parsed_results)
+        
+        # Extract URLs from response and save to file
+        try:
+            extract_and_save_urls(response)
+        except Exception as e:
+            print(f"Error extracting URLs: {str(e)}")
+        
         return response
 
 

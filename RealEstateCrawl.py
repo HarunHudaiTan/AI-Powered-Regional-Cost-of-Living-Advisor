@@ -1,15 +1,29 @@
 import asyncio, json
 from crawl4ai import AsyncWebCrawler
 from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig, CacheMode
+import os
+import argparse
+import sys
 
-async def main():
-
-    urls = [
-
-        "https://www.hepsiemlak.com/kecioren-kiralik",
-        "https://www.emlakjet.com/kiralik-konut/ankara-kecioren"
-
-    ]
+async def main(url_file="urls_for_crawling.txt", output_file="temp_crawl_result.md"):
+    # Read URLs from the specified file
+    urls = []
+    try:
+        if os.path.exists(url_file):
+            with open(url_file, "r") as f:
+                urls = [line.strip() for line in f if line.strip()]
+            
+            if not urls:
+                print(f"Error: No URLs found in {url_file}")
+                return
+        else:
+            print(f"Error: File {url_file} not found")
+            return
+    except Exception as e:
+        print(f"Error reading URLs file: {str(e)}")
+        return
+    
+    print(f"Crawling {len(urls)} URLs: {urls}")
 
     browser_config = BrowserConfig(verbose=True)
     run_config = CrawlerRunConfig(
@@ -30,7 +44,7 @@ async def main():
 
     async with AsyncWebCrawler(config=browser_config) as crawler:
         # Open the file in append mode for writing multiple results
-        with open("temp_crawl_result.md", "w", encoding="utf-8") as f:  # Changed mode to "w" to overwrite on each run.  Use "a" to append.
+        with open(output_file, "w", encoding="utf-8") as f:  # Changed mode to "w" to overwrite on each run.  Use "a" to append.
 
             for result in await crawler.arun_many(urls, config=run_config):
 
@@ -55,4 +69,11 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(description="Web crawler that reads URLs from a file")
+    parser.add_argument("-u", "--url-file", default="urls_for_crawling.txt", 
+                        help="Path to file containing URLs to crawl (default: urls_for_crawling.txt)")
+    parser.add_argument("-o", "--output", default="temp_crawl_result.md",
+                        help="Path to save crawl results (default: temp_crawl_result.md)")
+    args = parser.parse_args()
+    
+    asyncio.run(main(args.url_file, args.output))
