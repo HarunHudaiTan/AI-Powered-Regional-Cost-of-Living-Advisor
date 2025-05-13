@@ -62,6 +62,7 @@ class SearchAgent(Agent):
         response= self.search_agent.response("User query" + message["text"] + "Google search results" + string_parsed_results)
         return response
 
+
 agent=SearchAgent()
 import gradio as gr
 demo = gr.ChatInterface(

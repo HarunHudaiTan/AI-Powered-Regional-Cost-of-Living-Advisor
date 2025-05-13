@@ -3,6 +3,14 @@ from crawl4ai import AsyncWebCrawler
 from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig, CacheMode
 
 async def main():
+
+    urls = [
+
+        "https://www.hepsiemlak.com/kecioren-kiralik",
+        "https://www.emlakjet.com/kiralik-konut/ankara-kecioren"
+
+    ]
+
     browser_config = BrowserConfig(verbose=True)
     run_config = CrawlerRunConfig(
         # Content filtering
@@ -18,27 +26,33 @@ async def main():
         cache_mode=CacheMode.ENABLED  # Use cache if available
     )
 
+    results = []
+
     async with AsyncWebCrawler(config=browser_config) as crawler:
-        result = await crawler.arun(
-            url="https://www.hepsiemlak.com/kecioren-kiralik",
-            config=run_config
-        )
+        # Open the file in append mode for writing multiple results
+        with open("temp_crawl_result.md", "w", encoding="utf-8") as f:  # Changed mode to "w" to overwrite on each run.  Use "a" to append.
 
-        if result.success:
+            for result in await crawler.arun_many(urls, config=run_config):
 
-            with open("temp_crawl_result.md", "w") as f:
-                f.write(result.markdown)
 
-            # Process images
-            for image in result.media["images"]:
-                print(f"Found image: {image['src']}")
+                if result.success:
 
-            # Process links
-            for link in result.links["internal"]:
-                print(f"Internal link: {link['href']}")
+                    # Write the markdown content for each successful crawl
+                    f.write(f"# URL: {result.url}\n\n")  # Add URL as a header
+                    f.write(result.markdown)
+                    f.write("\n\n---\n\n")  # Add a separator between results
 
-        else:
-            print(f"Crawl failed: {result.error_message}")
+                # Process images
+                    for image in result.media["images"]:
+                        print(f"Found image: {image['src']}")
+
+                # Process links
+                    for link in result.links["internal"]:
+                        print(f"Internal link: {link['href']}")
+
+                else:
+                    print(f"Crawl failed for {result.url}: {result.error_message}")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

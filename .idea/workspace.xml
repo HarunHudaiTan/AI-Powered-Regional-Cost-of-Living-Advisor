@@ -6,7 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="26cd95a3-fdbf-426d-bb98-0ec6c0a555f1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Parsed_Docs/temp_crawl_result.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Crawl.py" beforeDir="false" afterPath="$PROJECT_DIR$/Crawl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealEstateAgent.py" beforeDir="false" afterPath="$PROJECT_DIR$/RealEstateAgent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SearchAgent.py" beforeDir="false" afterPath="$PROJECT_DIR$/SearchAgent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parsing.py" beforeDir="false" afterPath="$PROJECT_DIR$/parsing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rentals_json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/temp_crawl_result.md" beforeDir="false" afterPath="$PROJECT_DIR$/temp_crawl_result.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,43 +28,45 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "FawkesFeu"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;FawkesFeu&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/HarunHudaiTan/AI-Powered-Regional-Cost-of-Living-Advisor.git",
-    "accountId": "8a59e37c-16d4-45ec-a6fb-599d760123be"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/HarunHudaiTan/AI-Powered-Regional-Cost-of-Living-Advisor.git&quot;,
+    &quot;accountId&quot;: &quot;8a59e37c-16d4-45ec-a6fb-599d760123be&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 2
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2x2OLPZF3fllf4gjGPbbOtTiRF9" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Crawl.executor": "Run",
-    "Python.MDtoJSON_parsing.executor": "Run",
-    "Python.RealEstateAgent.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feature/real-estate-agent",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Crawl.executor&quot;: &quot;Run&quot;,
+    &quot;Python.MDtoJSON_parsing.executor&quot;: &quot;Run&quot;,
+    &quot;Python.RealEstateAgent.executor&quot;: &quot;Run&quot;,
+    &quot;Python.SearchAgent.executor&quot;: &quot;Run&quot;,
+    &quot;Python.parsing.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/real-estate-agent&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Baran\Documents\GitHub\AI-Powered-Regional-Cost-of-Living-Advisor" />
@@ -81,7 +88,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1747132650054</updated>
-      <workItem from="1747132650069" duration="547000" />
+      <workItem from="1747132650069" duration="718000" />
+      <workItem from="1747134614726" duration="997000" />
+      <workItem from="1747155482654" duration="661000" />
+      <workItem from="1747156156943" duration="2629000" />
+      <workItem from="1747162724249" duration="504000" />
+      <workItem from="1747163239054" duration="372000" />
     </task>
     <servers />
   </component>
@@ -89,8 +101,10 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$SearchAgent.coverage" NAME="SearchAgent Coverage Results" MODIFIED="1747163243142" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$MDtoJSON_parsing.coverage" NAME="MDtoJSON_parsing Coverage Results" MODIFIED="1746974332830" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$Crawl.coverage" NAME="Crawl Coverage Results" MODIFIED="1747133096167" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$RealEstateAgent.coverage" NAME="RealEstateAgent Coverage Results" MODIFIED="1746974505321" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$parsing.coverage" NAME="parsing Coverage Results" MODIFIED="1747156641327" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$Crawl.coverage" NAME="Crawl Coverage Results" MODIFIED="1747156605184" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$RealEstateAgent.coverage" NAME="RealEstateAgent Coverage Results" MODIFIED="1747158506682" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
