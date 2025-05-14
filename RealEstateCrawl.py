@@ -4,10 +4,19 @@ from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig, CacheMode
 import os
 import argparse
 import sys
+from urllib.parse import urlparse
 
-async def main(url_file="urls_for_crawling.txt", output_file="temp_crawl_result.md"):
+# Default allowed domains
+DEFAULT_ALLOWED_DOMAINS = [
+    "hepsiemlak.com",
+    "emlakjet.com",
+    "emlakgo.com"
+]
+
+async def main(url_file="urls_for_crawling.txt", output_file="temp_crawl_result.md", allowed_domains=None):
     # Read URLs from the specified file
     urls = []
+    filtered_urls = []
     try:
         if os.path.exists(url_file):
             with open(url_file, "r") as f:
@@ -15,6 +24,33 @@ async def main(url_file="urls_for_crawling.txt", output_file="temp_crawl_result.
             
             if not urls:
                 print(f"Error: No URLs found in {url_file}")
+                return
+            
+            # Filter URLs by domain
+            # Use provided domains from command line if specified,
+            # otherwise use the default list
+            if allowed_domains:
+                allowed_domains_list = [d.strip() for d in allowed_domains.split(',')]
+            else:
+                allowed_domains_list = DEFAULT_ALLOWED_DOMAINS
+                
+            print(f"Filtering URLs by allowed domains: {allowed_domains_list}")
+            
+            for url in urls:
+                try:
+                    domain = urlparse(url).netloc
+                    if any(domain.endswith(d) or domain == d for d in allowed_domains_list):
+                        filtered_urls.append(url)
+                    else:
+                        print(f"Skipping URL with non-allowed domain: {url}")
+                except Exception as e:
+                    print(f"Error parsing URL {url}: {str(e)}")
+            
+            urls = filtered_urls
+            print(f"After filtering: {len(urls)} URLs remain")
+            
+            if not urls:
+                print("No URLs left after domain filtering. Exiting.")
                 return
         else:
             print(f"Error: File {url_file} not found")
@@ -31,6 +67,7 @@ async def main(url_file="urls_for_crawling.txt", output_file="temp_crawl_result.
         word_count_threshold=10,
         excluded_tags=['form', 'header'],
         exclude_external_links=True,
+
 
         # Content processing
         process_iframes=True,
@@ -74,6 +111,8 @@ if __name__ == "__main__":
                         help="Path to file containing URLs to crawl (default: urls_for_crawling.txt)")
     parser.add_argument("-o", "--output", default="temp_crawl_result.md",
                         help="Path to save crawl results (default: temp_crawl_result.md)")
+    parser.add_argument("-d", "--domains", 
+                        help="Comma-separated list of allowed domains (e.g., 'example.com,test.org')")
     args = parser.parse_args()
     
-    asyncio.run(main(args.url_file, args.output))
+    asyncio.run(main(args.url_file, args.output, args.domains))
