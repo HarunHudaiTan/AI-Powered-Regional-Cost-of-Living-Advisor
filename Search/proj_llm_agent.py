@@ -25,12 +25,36 @@ class LLM_Agent:
             ],
         )
 
-    def generate_response(self, contents,file_path=""):
+    # def upload_files(self,
+    #                  directory_path="/Users/harun/Documents/GitHub/AI-Powered-Regional-Cost-of-Living-Advisor/Search/crawl_results"):
+    #     import os
+    #
+    #     uploaded_files = []
+    #
+    #     # Check if the path exists and is a directory
+    #     if not os.path.exists(directory_path) or not os.path.isdir(directory_path):
+    #         raise ValueError(f"The specified path '{directory_path}' does not exist or is not a directory.")
+    #
+    #     # Iterate over all files in the directory
+    #     for filename in os.listdir(directory_path):
+    #         file_path = os.path.join(directory_path, filename)
+    #
+    #         # Skip directories, only upload files
+    #         if os.path.isfile(file_path):
+    #             try:
+    #                 myfile = self.client.files.upload(file=file_path)
+    #                 uploaded_files.append(myfile)
+    #                 print(f"Successfully uploaded: {filename}")
+    #             except Exception as e:
+    #                 print(f"Failed to upload {filename}: {e}")
+    #
+    #     return uploaded_files
+    def generate_response(self, contents):
         try:
-            myfile = self.client.files.upload(file=file_path)
+
             response = self.client.models.generate_content(
             model=self.model,
-            contents= [contents,myfile],
+            contents= [contents],
                 config={
                     "response_mime_type": self.response_mime_type,
                     "system_instruction": self.role,
