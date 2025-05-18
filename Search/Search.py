@@ -1,13 +1,17 @@
 
 import json
 import requests
+from KeywordAgent import parse_keywords
+from Crawl import WebCrawler  # Import WebCrawler class from Crawl.py
+
 
 def search(keywords,url = "https://google.serper.dev/search"):
 
   payload = json.dumps({
     "q": keywords,
     "location": "Ankara, Turkey",
-    "gl": "tr"
+    "gl": "tr",
+    "num":7
   })
   headers = {
     'X-API-KEY': '62017f0e33239b07f3c4cacb74ab1f691f8ca5fa',
@@ -17,18 +21,14 @@ def search(keywords,url = "https://google.serper.dev/search"):
   response = requests.request("POST", url, headers=headers, data=payload)
 
   return response.json()
-
-def parse_search_results(results):
-  entries = []
+def parse_search_links(results):
   links=[]
   for result in results.get("organic", []):
-    title=result.get("title")
     link=result.get("link")
-    snippet=result.get("snippet")
-    if title and link and snippet:
-      entries.append((title, link, snippet ))
+    if link :
       links.append(link)
-  return entries
+  return links
 
-
+def filter_links(links):
+  return [link for link in links if "sahibinden.com" not in link]
 

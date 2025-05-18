@@ -5,7 +5,7 @@ from google.genai import types
 from Agent import Agent
 
 
-class Keyword_Agent(Agent):
+class KeywordAgent(Agent):
     def __init__(self):
         super().__init__(self.system_instructions, "application/json")
 
@@ -43,8 +43,8 @@ class Keyword_Agent(Agent):
     
     """
 
-keyword_agent=Keyword_Agent()
-def parse_keyword_agent(prompt):
+keyword_agent=KeywordAgent()
+def parse_keywords(prompt):
     response=keyword_agent.response(prompt)
     return response
 
