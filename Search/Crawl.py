@@ -1,9 +1,6 @@
 import asyncio
 from crawl4ai import AsyncWebCrawler, DefaultMarkdownGenerator
 from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig, CacheMode
-import json
-import re
-import os
 
 async def _crawl_urls_async(urls):
     """Internal async function to crawl a list of URLs"""
@@ -33,7 +30,7 @@ async def _crawl_urls_async(urls):
         for url in urls:
             print(f"Crawling: {url}")
             result = await crawler.arun(
-                url=url,
+                url="url",
                 config=run_config
             )
             if result.success:

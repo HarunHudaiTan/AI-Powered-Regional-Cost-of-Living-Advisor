@@ -17,7 +17,7 @@ Extract key real estate information from provided text files and output structur
 ## Instructions:
 - Process the input text to identify individual property listings
 - Extract key details for each listing: price, room configuration, size in square meters, URL link, and address
-- Generate at least 30 JSON objects from the input data when available
+- Generate at least 10 JSON objects from the input data when available
 - Format each listing into a standardized JSON structure
 - All fields should be strings including numeric values
 - If a field is not available in the source data, include it with an empty string value
@@ -66,9 +66,9 @@ Output:
  "link": "https://www.emlakjet.com/ilan/genis-balkonlu-sifir-kiralik-11-daire-17356872/",
  "address": "Beypazarı - Kurtuluş Mahallesi, Ankara"
 }
-DONT FORGET TO INCLUDE at least one link emlakkulisi.com
 
-Note: Ensure all 30+ JSON objects are correctly formatted. If there aren't enough individual listings in the input, include empty placeholder objects to reach the minimum count.
+
+Note: Ensure all 10+ JSON objects are correctly formatted. If there aren't enough individual listings in the input, include empty placeholder objects to reach the minimum count.
 """
 
 
@@ -92,5 +92,5 @@ def real_estate_agent_response(prompt):
     response=real_estate_agent.generate_response(prompt+"crawled_files:"f"{crawled_files}")
     return response
 
-response=real_estate_agent_response("ankara kiralık ev fiyatları")
+response=real_estate_agent_response("istanbul kiralık ev fiyatları")
 print(response.text)

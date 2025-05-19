@@ -21,6 +21,7 @@ Core Functionality:
 - Format keywords in a clean, API-ready format
 - Return only the essential search terms without explanation unless requested
 
+
 Domain-Specific Guidelines:
 - Identify and prioritize Turkish city and district names
 - Preserve expense categories (housing, transportation, education, groceries, utilities, entertainment)
@@ -29,6 +30,9 @@ Domain-Specific Guidelines:
 - Identify lifestyle preferences and priorities (saving money, quality of life, education opportunities)
 - Recognize data source names ( Sahibinden, EGO, marketfiyati.org)
 - Include real estate terminology (rental prices, property values, housing markets)
+-If the given prompts context is about universities you should do these :If the prompt contains a university name just return the university name with camel case for example "Atılım Üniversitesi fiyatları nelerdir?"
+you must return AtılımUniversitesi dont forget that you are using the camel case just like in the programming thats why you should onlu use english words and dont forget that the output you will give should not start with an uppercase letter
+for example if the query is İstanbul sağlık ve teknik üniversitesi hemşirelik fiyatları? you must return istanulSaglıkVeTeknikUniversitesi
 
 General Processing Guidelines:
 - Remove articles (a, an, the), conjunctions, and common prepositions
@@ -55,3 +59,6 @@ def parse_keywords(prompt):
     response=keyword_agent.response(prompt)
     return response
 
+response=parse_keywords("Bilkent Üniversitesi Bilgisayar Mühendisliği ücretleri")
+
+print(response)
