@@ -1,5 +1,6 @@
 import textwrap
 from IPython.display import Markdown, display
+from langchain_text_splitters import SentenceTransformersTokenTextSplitter
 from pypdf import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import numpy as np
@@ -17,7 +18,6 @@ def convert_PDF_Text(pdf_path):
     pdf_texts = [p.extract_text().strip() for p in reader.pages]
     # Filter the empty strings
     pdf_texts = [text for text in pdf_texts if text]
-    print("Document: ", pdf_path, " chunk size: ", len(pdf_texts))
     return pdf_texts
 
 
@@ -28,7 +28,7 @@ def to_markdown(text):
 
 
 # NEW FUNCTION: Modified chunk creation using sentence-based approach
-def create_sentence_chunks(pdf_texts, chunk_size=800, chunk_overlap=200):
+def text_Chunks_in_Char(pdf_texts, chunk_size=800, chunk_overlap=100):
     # Combine all PDF texts into one string
     full_text = '\n\n'.join(pdf_texts)
 
@@ -42,9 +42,20 @@ def create_sentence_chunks(pdf_texts, chunk_size=800, chunk_overlap=200):
 
     # Split text into chunks based on sentences
     chunks = sentence_splitter.split_text(full_text)
-
-    print(f"\nTotal number of sentence-based chunks: {len(chunks)}")
     return chunks
+
+
+def convert_Chunk_Token(text_chunksinChar, sentence_transformer_model, chunk_overlap=10, tokens_per_chunk=128):
+    token_splitter = SentenceTransformersTokenTextSplitter(
+        chunk_overlap=chunk_overlap,
+        model_name=sentence_transformer_model,
+        tokens_per_chunk=tokens_per_chunk)
+
+    text_chunksinTokens = []
+    for text in text_chunksinChar:
+        text_chunksinTokens += token_splitter.split_text(text)
+    print(f"\nTotal number of chunks (document splited by 128 tokens per chunk): {len(text_chunksinTokens)}")
+    return text_chunksinTokens
 
 
 # The rest of your embedding and collection logic remains the same
@@ -53,7 +64,7 @@ embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(mo
 
 
 def create_chroma_client(collection_name, embedding_function):
-    chroma_client = Client()
+    chroma_client = chromadb.PersistentClient()
 
     # Check if collection already exists and delete it
     existing_collections = [col.name for col in chroma_client.list_collections()]
@@ -81,22 +92,30 @@ def add_meta_data(chunks, title, category, initial_id):
 
 
 def add_document_to_collection(ids, metadatas, chunks, chroma_collection):
-    print("Before inserting, the size of the collection: ", chroma_collection.count())
     chroma_collection.upsert(ids=ids, metadatas=metadatas, documents=chunks)
-    print("After inserting, the size of the collection: ", chroma_collection.count())
     return chroma_collection
 
 
-def retrieveDocs(chroma_collection, query,file,n_results=10, return_only_docs=False):
-    results = chroma_collection.query(query_texts=[query],
-                                      include=["documents", "metadatas", 'distances'],
-                                      where={"document":f"{file}.pdf"},
-                                      n_results=n_results)
+def retrieveDocs(chroma_collection, query, file=None, n_results=10, return_only_docs=False):
+
+    # Build query parameters
+    query_params = {
+        "query_texts": [query],
+        "include": ["documents", "metadatas", 'distances'],
+        "n_results": n_results
+    }
+
+    # Add file filter if provided
+    if file is not None:
+        query_params["where"] = {"document": f"{file}.pdf"}
+
+    # Execute the query
+    results = chroma_collection.query(**query_params)
+
     if return_only_docs:
         return results['documents'][0]
     else:
         return results
-
 
 def show_results(results, return_only_docs=False):
     if return_only_docs:
@@ -162,7 +181,6 @@ def load_multiple_pdfs_to_ChromaDB(collection_name, sentence_transformer_model):
     Args:
         collection_name (str): Name of the ChromaDB collection
         sentence_transformer_model (str): Name of the sentence transformer model to use
-        chromaDB_path (str, optional): Path to store ChromaDB data. Defaults to None.
 
     Returns:
         tuple: (chroma_client, chroma_collection)
@@ -183,29 +201,49 @@ def load_multiple_pdfs_to_ChromaDB(collection_name, sentence_transformer_model):
         # Extract text from PDF
         pdf_texts = convert_PDF_Text(pdf_path)
 
-        # Create sentence-based chunks
-        chunks = create_sentence_chunks(pdf_texts)
+        # Create character-based chunks first
+        char_chunks = text_Chunks_in_Char(pdf_texts)
+        
+        # Convert to token-based chunks
+        token_chunks = convert_Chunk_Token(char_chunks, sentence_transformer_model)
 
         # Add metadata and get IDs
-        ids, metadatas = add_meta_data(chunks, pdf_path, "PricePaper", current_id)
+        ids, metadatas = add_meta_data(token_chunks, pdf_path, "PricePaper", current_id)
 
         # Update current_id for next document
-        current_id += len(chunks)
+        current_id += len(token_chunks)
 
         # Add to collection
-        chroma_collection = add_document_to_collection(ids, metadatas, chunks, chroma_collection)
-
-        print(f"Document: {pdf_path} added to the collection. New size: {chroma_collection.count()}")
+        chroma_collection = add_document_to_collection(ids, metadatas, token_chunks, chroma_collection)
 
     return chroma_client, chroma_collection
 
 
+def get_existing_chroma_collection(collection_name):
+
+    chroma_client = chromadb.PersistentClient()
+    
+    # Get the existing collection
+    chroma_collection = chroma_client.get_collection(
+        name=collection_name
+    )
+    
+    return  chroma_collection
+
+
 import KeywordAgent as keyword_agent
 
-chroma_client, chroma_collection = load_multiple_pdfs_to_ChromaDB("UniPrices", sentence_transformer_model)
-query = " lokman hekim üniversitesi yaşlı bakımı ücretleri"
+# Test code
+# chroma_client, chroma_collection = load_multiple_pdfs_to_ChromaDB("UniPrices", sentence_transformer_model)
+chroma_collection=get_existing_chroma_collection("UniPrices")
+
+query = " Sabahattin Zaim Universitesi Uluslararası Ticaret ve Finansman fiyat"
 keyword = keyword_agent.parse_keywords(query)
-filtered_keyword=keyword.strip('"')
-retrieved_documents = retrieveDocs(chroma_collection, query,filtered_keyword,10)
-show_results(retrieved_documents)
+filtered_keyword = keyword.strip('"')
+if filtered_keyword != 'None':
+    retrieved_documents = retrieveDocs(chroma_collection, query, filtered_keyword, 5)
+    show_results(retrieved_documents)
+else:
+    retrieved_documents = retrieveDocs(chroma_collection, query, None, 5)
+    show_results(retrieved_documents)
 

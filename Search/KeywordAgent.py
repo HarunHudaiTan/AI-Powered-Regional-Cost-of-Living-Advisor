@@ -3,11 +3,12 @@ from google import genai
 from google.genai import types
 
 from Agent import Agent
+from proj_llm_agent import LLM_Agent
 
 
-class KeywordAgent(Agent):
+class KeywordAgent(LLM_Agent):
     def __init__(self):
-        super().__init__(self.system_instructions, "application/json")
+        super().__init__("Keyowrod Agent",self.system_instructions,response_mime_type="application/json" )
 
     system_instructions="""
 System Prompt for Keyword Extraction Agent in Cost of Living Domain
@@ -30,9 +31,68 @@ Domain-Specific Guidelines:
 - Identify lifestyle preferences and priorities (saving money, quality of life, education opportunities)
 - Recognize data source names ( Sahibinden, EGO, marketfiyati.org)
 - Include real estate terminology (rental prices, property values, housing markets)
--If the given prompts context is about universities you should do these :If the prompt contains a university name just return the university name with camel case for example "Atılım Üniversitesi fiyatları nelerdir?"
-you must return AtılımUniversitesi dont forget that you are using the camel case just like in the programming thats why you should onlu use english words and dont forget that the output you will give should not start with an uppercase letter
-for example if the query is İstanbul sağlık ve teknik üniversitesi hemşirelik fiyatları? you must return istanulSaglıkVeTeknikUniversitesi
+-If the given prompts context is about universities you must return one of the universities names in camel case in a string given below:
+        "alanyaHepUniversitesi",
+            "ankaraBilimUniversitesi",
+            "ankaraMedipolUniversitesi",
+            "antalyaBelekUniversitesi",
+            "atilimUniversitesi",
+            "avrasyaUniversitesi",
+            "baskentUniversitesi",
+            "beykentUniversitesi",
+            "beykozUniversitesi",
+            "bezmIAlemVakifUniversitesi",
+            "bilkentUniversitesi",
+            "biruniUniversitesi",
+            "cagUniversitesi",
+            "cankayaUniversitesi",
+            "demirciogluBilimUniversitesi",
+            "dogusUniversitesi",
+            "fatihSultanMehmetUniversitesi",
+            "fenerbahceUniversitesi",
+            "halicUniversitesi",
+            "hasanKalyoncuUniversitesi",
+            "ibnHaldunUniversitesi",
+            "istanbul29MayisUniversitesi",
+            "istanbulAtlasUniversitesi",
+            "istanbulAydinUniversitesi",
+            "istanbulEsenyurtUniversitesi",
+            "istanbulGalataUniversitesi",
+            "istanbulGedikUniversitesi",
+            "istanbulKentUniversitesi",
+            "istanbulKulturUniversitesi",
+            "istanbulNisantasiUniversitesi",
+            "istanbulRumeliUniversitesi",
+            "istanbulSabahattinZaimUniversitesi",
+            "istanbulSaglikVeSosyalBilimlerMeslekYuksekokulu",
+            "istanbulSaglikVeTeknolojiUniversitesi",
+            "istanbulSisliMeslekYuksekokulu",
+            "istanbulTicaretUniversitesi",
+            "istanbulYeniYuzyilUniversitesi",
+            "istinyeUniversitesi",
+            "izmirEkonomi",
+            "kadirHasUniversitesi",
+            "kapadokyaUniversitesi",
+            "kocUniversitesi",
+            "kocaeliSaglikVeTeknolojiUniversitesi",
+            "konyaGidaVeTarimUniversitesi",
+            "ktoKaratayUniversitesi",
+            "lokmanHekimUniversitesi",
+            "maltepeUniversitesi",
+            "mudanyaUniversitesi",
+            "nuhNaciYazganUniversitesi",
+            "ostimTeknikUniversitesi",
+            "piriReisUniversitesi",
+            "sabanciUniversitesi",
+            "sankoUniversitesi",
+            "tedUniversitesi",
+            "tobbUniversitesi",
+            "torosUniversitesi",
+            "turkHavaKurumuUniversitesi",
+            "ufukUniversitesi",
+            "uskudarUniversitesi",
+            "yasarUniversitesi",
+            "yuksekIhtisasUniversitesi"
 
 General Processing Guidelines:
 - Remove articles (a, an, the), conjunctions, and common prepositions
@@ -54,11 +114,14 @@ Output: "ankara, kiralık, daire"
 Remember, your primary goal is to transform natural language queries about Turkish cost of living into precise, effective search keywords for the Serper API. Focus on extracting terms that will yield the most relevant search results while maintaining the user's intent regarding relocation decisions and expense comparisons.
     """
 
+
+
+
 keyword_agent=KeywordAgent()
 def parse_keywords(prompt):
-    response=keyword_agent.response(prompt)
-    return response
+    response=keyword_agent.generate_response(prompt)
+    return response.text
 
-response=parse_keywords("Bilkent Üniversitesi Bilgisayar Mühendisliği ücretleri")
+response=parse_keywords("Sabahattin Zaim Universitesi")
 
 print(response)
