@@ -5,21 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="26cd95a3-fdbf-426d-bb98-0ec6c0a555f1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/AI-Powered-Regional-Cost-of-Living-Advisor.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AI-Powered-Regional-Cost-of-Living-Advisor.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Agent.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Keyword_Agent.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealEstateAgent.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealEstateCrawl.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealEstateParsing.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Search.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SearchAgent.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/URL_EXTRACTOR_README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/extract_urls.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rentals.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/temp_crawl_result.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/url_extractor.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/urls_for_crawling.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,8 +66,8 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Baran\Documents\GitHub\AI-Powered-Regional-Cost-of-Living-Advisor\RAG\chroma" />
       <recent name="C:\Users\Baran\Documents\GitHub\AI-Powered-Regional-Cost-of-Living-Advisor\RAG" />
+      <recent name="C:\Users\Baran\Documents\GitHub\AI-Powered-Regional-Cost-of-Living-Advisor\RAG\chroma" />
       <recent name="C:\Users\Baran\Documents\GitHub\AI-Powered-Regional-Cost-of-Living-Advisor" />
     </key>
   </component>
@@ -113,6 +99,8 @@
       <workItem from="1747218645294" duration="594000" />
       <workItem from="1747824208850" duration="658000" />
       <workItem from="1747830099791" duration="34000" />
+      <workItem from="1747830223106" duration="300000" />
+      <workItem from="1747830551815" duration="47000" />
     </task>
     <servers />
   </component>
