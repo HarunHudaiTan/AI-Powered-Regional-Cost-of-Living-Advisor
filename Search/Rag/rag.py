@@ -3,13 +3,9 @@ from IPython.display import Markdown, display
 from langchain_text_splitters import SentenceTransformersTokenTextSplitter
 from pypdf import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-import numpy as np
 import chromadb
 import os
 from chromadb.utils import embedding_functions
-from chromadb import Client
-from tqdm.notebook import trange, tqdm
-from pprint import pprint
 
 
 # Keep your PDF extraction function as is
@@ -111,7 +107,7 @@ def retrieveDocs(chroma_collection, query, file=None, n_results=10, return_only_
 
     # Execute the query
     results = chroma_collection.query(**query_params)
-
+    print(results['distances'])
     if return_only_docs:
         return results['documents'][0]
     else:
@@ -120,33 +116,29 @@ def retrieveDocs(chroma_collection, query, file=None, n_results=10, return_only_
 def show_results(results, return_only_docs=False):
     if return_only_docs:
         retrieved_documents = results
+
         if len(retrieved_documents) == 0:
-            print("No results found.")
-            return
-        for i, doc in enumerate(retrieved_documents):
-            print(f"Document {i + 1}:")
-            print("\tDocument Text: ")
-            pprint(doc)
+            return []
+        # Format each document with a bullet point
+        formatted_docs = [f"• {doc}" for doc in retrieved_documents]
+        return "\n".join(formatted_docs)
     else:
         retrieved_documents = results['documents'][0]
+        metadatas = results['metadatas'][0]
+        
         if len(retrieved_documents) == 0:
-            print("No results found.")
-            return
-        retrieved_documents_metadata = results['metadatas'][0]
-        retrieved_documents_distances = results['distances'][0]
-        print("------- Retrieved documents -------\n")
-
-        for i, doc in enumerate(retrieved_documents):
-            print(f"Document {i + 1}:")
-            print("\tDocument Text: ")
-            pprint(doc)
-            # Extract filename from the full path
-            full_path = retrieved_documents_metadata[i]['document']
-            filename = os.path.basename(full_path)
-            print(f"\tDocument Source: {filename}")
-            print(f"\tDocument Source Type: {retrieved_documents_metadata[i]['category']}")
-            print(f"\tDocument Distance: {retrieved_documents_distances[i]}")
-            print("-" * 80)
+            return []
+            
+        # Format each document with source information
+        formatted_docs = []
+        for doc, metadata in zip(retrieved_documents, metadatas):
+            # Clean up the document text by removing extra spaces and [UNK] tokens
+            cleaned_doc = doc.replace('[UNK]', '').strip()
+            # Add proper spacing between sentences
+            cleaned_doc = '. '.join(s.strip() for s in cleaned_doc.split('.') if s.strip())
+            formatted_doc = f"• {cleaned_doc}\n  From: {metadata['document']}\n"
+            formatted_docs.append(formatted_doc)
+        return "\n".join(formatted_docs)
 
 
 def list_files_in_directory(directory_path):
@@ -231,19 +223,24 @@ def get_existing_chroma_collection(collection_name):
     return  chroma_collection
 
 
-import KeywordAgent as keyword_agent
+from KeywordAgent import *
 
-# Test code
-# chroma_client, chroma_collection = load_multiple_pdfs_to_ChromaDB("UniPrices", sentence_transformer_model)
-chroma_collection=get_existing_chroma_collection("UniPrices")
+# university_dictionary=parse_university_keywords("Oğlumu Ostim Teknik Üniversitesinde Fizyoterapi bölümünde Okutmak istiyorum Fiyatları nelerdir")
+# university_name=university_dictionary["university_name"]
+# department=university_dictionary["department"]
+# print(department)
+# chroma_collection = get_existing_chroma_collection("UniPrices")
+# query = department+"Ücretleri"
+# retrieved_documents = retrieveDocs(chroma_collection, query, university_name, 10, return_only_docs=True)
+# print(show_results(retrieved_documents,return_only_docs=True))
 
-query = " Sabahattin Zaim Universitesi Uluslararası Ticaret ve Finansman fiyat"
-keyword = keyword_agent.parse_keywords(query)
-filtered_keyword = keyword.strip('"')
-if filtered_keyword != 'None':
-    retrieved_documents = retrieveDocs(chroma_collection, query, filtered_keyword, 5)
-    show_results(retrieved_documents)
-else:
-    retrieved_documents = retrieveDocs(chroma_collection, query, None, 5)
-    show_results(retrieved_documents)
+def rag_Response(query):
+    chroma_collection=get_existing_chroma_collection("UniPrices")
+    university_dictionary = parse_university_keywords(query)
+    university_name = university_dictionary["university_name"]
+    department = university_dictionary["department"]
+    rag_query = department + "Ücretleri"
+    retrieved_documents = retrieveDocs(chroma_collection, rag_query, university_name, 10,return_only_docs=True)
+    print(show_results(retrieved_documents, return_only_docs=True))
+    return show_results(retrieved_documents, return_only_docs=True)
 
