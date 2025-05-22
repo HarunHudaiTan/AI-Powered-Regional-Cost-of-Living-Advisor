@@ -8,7 +8,7 @@ from proj_llm_agent import LLM_Agent
 
 class KeywordAgent(LLM_Agent):
     def __init__(self):
-        super().__init__("Keyowrod Agent",self.system_instructions,response_mime_type="application/json" )
+        super().__init__("Real Estate Keyword Agent", self.system_instructions, response_mime_type="application/json")
 
     system_instructions="""
 System Prompt for Keyword Extraction Agent in Cost of Living Domain
@@ -122,6 +122,3 @@ def parse_keywords(prompt):
     response=keyword_agent.generate_response(prompt)
     return response.text
 
-response=parse_keywords("Sabahattin Zaim Universitesi")
-
-print(response)

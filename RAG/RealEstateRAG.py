@@ -27,7 +27,7 @@ def convert_Page_ChunkinChar(pdf_texts, chunk_size=700, chunk_overlap=100):
     print(f"\nTotal number of chunks (document split by max char = {chunk_size}): {len(character_split_texts)}")
     return character_split_texts
 
-def convert_Chunk_Token(text_chunksinChar, sentence_transformer_model, chunk_overlap=20, tokens_per_chunk=64):
+def convert_Chunk_Token(text_chunksinChar, sentence_transformer_model, chunk_overlap=20, tokens_per_chunk=128):
     token_splitter = SentenceTransformersTokenTextSplitter(
         chunk_overlap=chunk_overlap,
         model_name=sentence_transformer_model,
@@ -180,20 +180,31 @@ def display_chunks(results: Dict[str, Any], max_chunks: int = 5) -> None:
     if len(results['documents'][0]) > max_chunks:
         print(f"\n... and {len(results['documents'][0]) - max_chunks} more chunks")
 
-def show_results(results, return_only_docs=False):
-    if return_only_docs:
-        retrieved_documents = results
-        if len(retrieved_documents) == 0:
-            print("No results found.")
-            return
-        for i, doc in enumerate(retrieved_documents):
-            print(f"Document {i+1}:")
-            print("\tDocument Text: ")
-            print(format_chunk(doc))
-    else:
-        display_chunks(results)
+def show_results(results):
+    """
+    Display RAG results in a readable format.
+    
+    Args:
+        results (List[Dict]): List of result dictionaries containing 'document' and 'metadata' keys
+    """
+    if not results:
+        print("No results found.")
+        return
+        
+    print("\n" + "="*80)
+    print("RAG RESULTS")
+    print("="*80 + "\n")
+    
+    for i, result in enumerate(results):
+        print(f"\nRESULT {i+1}")
+        print("-"*40)
+        print(f"Source: {result['metadata']['document']}")
+        print(f"Category: {result['metadata']['category']}")
+        print("\nContent:")
+        print(format_chunk(result['document']))
+        print("-"*40)
 
-def retrieveDocs(chroma_collection, query, n_results=5, return_only_docs=False):
+def retrieveDocs(chroma_collection, query, n_results=5):
     """
     Retrieve documents from ChromaDB based on a query.
     
@@ -201,10 +212,9 @@ def retrieveDocs(chroma_collection, query, n_results=5, return_only_docs=False):
         chroma_collection: ChromaDB collection to query
         query (str): The search query
         n_results (int): Number of results to return
-        return_only_docs (bool): If True, return only the document texts
         
     Returns:
-        Dict or List: Query results
+        List[Dict]: List of dictionaries containing 'document' and 'metadata' keys
     """
     results = chroma_collection.query(
         query_texts=[query],
@@ -212,10 +222,20 @@ def retrieveDocs(chroma_collection, query, n_results=5, return_only_docs=False):
         n_results=n_results
     )
 
-    if return_only_docs:
-        return results['documents'][0]
-    else:
-        return results
+    # Format results into a list of dictionaries
+    formatted_results = []
+    for doc, metadata, distance in zip(
+        results['documents'][0],
+        results['metadatas'][0],
+        results['distances'][0]
+    ):
+        formatted_results.append({
+            'document': doc,
+            'metadata': metadata,
+            'distance': distance
+        })
+    
+    return formatted_results
 
 def select_pdf_files() -> List[str]:
     """
@@ -242,6 +262,71 @@ def select_pdf_files() -> List[str]:
         print(f"{i}. {os.path.basename(path)}")
     
     return list(file_paths)
+
+def delete_document_from_collection(chroma_collection, document_name):
+    """
+    Delete all chunks of a specific document from the ChromaDB collection.
+    
+    Args:
+        chroma_collection: ChromaDB collection
+        document_name (str): Name of the document to delete
+        
+    Returns:
+        int: Number of chunks deleted
+    """
+    try:
+        # Get all documents with matching metadata
+        results = chroma_collection.get(
+            where={"document": document_name}
+        )
+        
+        if not results['ids']:
+            print(f"No document found with name: {document_name}")
+            return 0
+            
+        # Delete the documents
+        chroma_collection.delete(
+            ids=results['ids']
+        )
+        
+        deleted_count = len(results['ids'])
+        print(f"Successfully deleted {deleted_count} chunks from document: {document_name}")
+        return deleted_count
+        
+    except Exception as e:
+        print(f"Error deleting document: {str(e)}")
+        return 0
+
+def delete_all_documents_from_collection(chroma_collection):
+    """
+    Delete all documents from the ChromaDB collection.
+    
+    Args:
+        chroma_collection: ChromaDB collection
+        
+    Returns:
+        int: Number of chunks deleted
+    """
+    try:
+        # Get all documents
+        results = chroma_collection.get()
+        
+        if not results['ids']:
+            print("No documents found in the collection.")
+            return 0
+            
+        # Delete all documents
+        chroma_collection.delete(
+            ids=results['ids']
+        )
+        
+        deleted_count = len(results['ids'])
+        print(f"Successfully deleted all {deleted_count} chunks from the collection")
+        return deleted_count
+        
+    except Exception as e:
+        print(f"Error deleting documents: {str(e)}")
+        return 0
 
 if __name__ == "__main__":
     # Example usage
@@ -297,7 +382,7 @@ if __name__ == "__main__":
     
     # Run query on existing documents
     try:
-        query = "internet ne kadar?"
+        query = "Samsun su tarifesi"
         print(f"\nQuerying with: {query}")
         results = retrieveDocs(chroma_collection, query, n_results=5)
         show_results(results)

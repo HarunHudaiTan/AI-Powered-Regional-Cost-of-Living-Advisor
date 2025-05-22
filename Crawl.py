@@ -28,14 +28,20 @@ async def _crawl_urls_async(urls):
 
     async with AsyncWebCrawler(config=browser_config) as crawler:
         for url in urls:
-            print(f"Crawling: {url}")
-            result = await crawler.arun(
-                url="url",
-                config=run_config
-            )
-            if result.success:
-                print(result.markdown)
-                markdown_contents.append(result.markdown)
+            try:
+                print(f"Crawling: {url}")
+                result = await crawler.arun(
+                    url=url,
+                    config=run_config
+                )
+                if result.success:
+                    print(f"Successfully crawled: {url}")
+                    markdown_contents.append(result.markdown)
+                else:
+                    print(f"Failed to crawl {url}: {result.error if hasattr(result, 'error') else 'Unknown error'}")
+            except Exception as e:
+                print(f"Error crawling {url}: {str(e)}")
+                continue
 
     return markdown_contents
 
