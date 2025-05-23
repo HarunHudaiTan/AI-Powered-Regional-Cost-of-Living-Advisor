@@ -1,4 +1,4 @@
-from Agent import Agent
+
 from proj_llm_agent import LLM_Agent
 import os
 # Import the crawling functions from Crawl.py
@@ -92,5 +92,5 @@ def real_estate_agent_response(prompt):
     response=real_estate_agent.generate_response(prompt+"crawled_files:"f"{crawled_files}")
     return response
 
-response=real_estate_agent_response("istanbul kiralık ev fiyatları")
+response=real_estate_agent_response("ankara keçiören kiralık ev fiyatları")
 print(response.text)
