@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="26cd95a3-fdbf-426d-bb98-0ec6c0a555f1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;FawkesFeu&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/HarunHudaiTan/AI-Powered-Regional-Cost-of-Living-Advisor.git&quot;,
+    &quot;accountId&quot;: &quot;8a59e37c-16d4-45ec-a6fb-599d760123be&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2x2OLPZF3fllf4gjGPbbOtTiRF9" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.Crawl.executor": "Run",
+    "Python.MDtoJSON_parsing.executor": "Run",
+    "Python.RealEstateAgent.executor": "Run",
+    "Python.RealEstateCrawl.executor": "Run",
+    "Python.RealEstateParsing.executor": "Run",
+    "Python.RealEstateRAG.executor": "Run",
+    "Python.SearchAgent.executor": "Run",
+    "Python.parsing.executor": "Run",
+    "Python.rag.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "feature/real-estate-agent",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Baran\Documents\GitHub\AI-Powered-Regional-Cost-of-Living-Advisor\RAG" />
+      <recent name="C:\Users\Baran\Documents\GitHub\AI-Powered-Regional-Cost-of-Living-Advisor\RAG\chroma" />
+      <recent name="C:\Users\Baran\Documents\GitHub\AI-Powered-Regional-Cost-of-Living-Advisor" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-PY-243.25659.43" />
+        <option value="bundled-python-sdk-181015f7ab06-4df51de95216-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-243.25659.43" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="26cd95a3-fdbf-426d-bb98-0ec6c0a555f1" name="Changes" comment="" />
+      <created>1747132650054</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1747132650054</updated>
+      <workItem from="1747132650069" duration="718000" />
+      <workItem from="1747134614726" duration="997000" />
+      <workItem from="1747155482654" duration="661000" />
+      <workItem from="1747156156943" duration="2629000" />
+      <workItem from="1747162724249" duration="504000" />
+      <workItem from="1747163239054" duration="372000" />
+      <workItem from="1747166319268" duration="751000" />
+      <workItem from="1747213672659" duration="945000" />
+      <workItem from="1747217464718" duration="81000" />
+      <workItem from="1747218645294" duration="594000" />
+      <workItem from="1747824208850" duration="658000" />
+      <workItem from="1747830099791" duration="34000" />
+      <workItem from="1747830223106" duration="300000" />
+      <workItem from="1747830551815" duration="47000" />
+      <workItem from="1747833481808" duration="386000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$RealEstateCrawl.coverage" NAME="RealEstateCrawl Coverage Results" MODIFIED="1747219129428" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$rag.coverage" NAME="rag Coverage Results" MODIFIED="1747829988219" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/RAG" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$SearchAgent.coverage" NAME="SearchAgent Coverage Results" MODIFIED="1747218677504" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$RealEstateParsing.coverage" NAME="RealEstateParsing Coverage Results" MODIFIED="1747219181935" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$MDtoJSON_parsing.coverage" NAME="MDtoJSON_parsing Coverage Results" MODIFIED="1746974332830" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$parsing.coverage" NAME="parsing Coverage Results" MODIFIED="1747156641327" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$Crawl.coverage" NAME="Crawl Coverage Results" MODIFIED="1747156605184" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$RealEstateAgent.coverage" NAME="RealEstateAgent Coverage Results" MODIFIED="1747219206512" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AI_Powered_Regional_Cost_of_Living_Advisor$RealEstateRAG.coverage" NAME="RealEstateRAG Coverage Results" MODIFIED="1747833799217" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/RAG" />
+  </component>
+</project>
