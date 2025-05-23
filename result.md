@@ -1,1 +1,0 @@
-I have successfully retrieved the domates fiyatları from https://marketfiyati.org.tr. The prices are: Domates Kokteyl: 59,00₺, Pembe Domates: 59,00₺, Domates: 39,00₺, Domates Salkım Dökme: 49,00₺, Domates Salkım: 44,90₺, Şeker Domates 250 Gr: 35,00₺. I also retrieved the prices for Domates Salça.
