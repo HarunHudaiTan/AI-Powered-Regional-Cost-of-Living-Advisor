@@ -82,53 +82,7 @@ class LLM_Market_Pipeline():
             temperature=0.95,
             timebuffer=3
         )
-        self.market_natural_response = LLM_Agent(
-            name = "Market Natural Language Generator",
-            role = 
-            """You are an agent that is tasked with deducting if the given salary is feasable to sustain the person (or family if given in prompt).
-            You are focusing on the groceries that person will need to buy.
-            Youre also given a list of nessesary groceries that are commonly purchased. Theyre the cheapest ones in the market.
-            The list contains profucts from these categories:
-            - Red Meat
-            - White Meat
-            - Sucuk
-            - Salami
-            - Sausage
-            - Tuna
-            - Egg
-            - Cheese
-            - Bouillon
-            - Bone Broth
-            - Tomato Paste
-            - Bread
-            - Sugar
-            - Flour
-            - Baking Powder
-            - Butter
-            - Chocolate
-            - Bulgur
-            - Rice
-            - Pasta
-            - Liquid Oil
-            - Water
-            - Soft Drink
-            - Filter Coffee
-            - Liquid Dishwashing Detergent
-            - Dishwasher Tablet
-            - Bleach
-            - Powder Detergent
-            You should give avarage prices when explaining and what the user can buy with the given salary.
-            You should also do product suggestions with their prices.
-            Dont include any products that arent given in the data given to you.
-            """,
-            model = "gemini-2.0-flash",
-            response_type = "text/plain",
-            response_schema = None,
-            temperature=0.95,
-            timebuffer=3
-        )
 
-       
 
     def run_market_pipeline(self, prompt):
         """
@@ -155,15 +109,6 @@ class LLM_Market_Pipeline():
                 print("Failed to parse market listings.")
                 return None
             product_list_info.append(batch_result.text)
-        
-        # Step 3: Generate natural language response
-        print("Generating natural language response...")
-        natural_response = self.market_natural_response.generate_response([prompt, product_list_info])
 
-        if not natural_response:
-            print("Failed to generate natural language response.")
-            return None
-        
-        return natural_response
-
+        return product_list_info
 
