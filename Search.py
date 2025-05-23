@@ -1,4 +1,3 @@
-
 import json
 import requests
 from KeywordAgent import parse_keywords
@@ -30,5 +29,5 @@ def parse_search_links(results):
   return links
 
 def filter_links(links):
-  return [link for link in links if "sahibinden.com" not in link]
+    return [link for link in links if not any(site in link.lower() for site in ["sahibinden.com", "facebook.com", "tiktok.com"])]
 

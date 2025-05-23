@@ -1,15 +1,30 @@
 from Agent import Agent
 from proj_llm_agent import LLM_Agent
 import os
+import logging
 # Import the crawling functions from Crawl.py
 from Crawl import crawl_urls
 from RAG.RealEstateRAG import retrieveDocs, show_results, create_chroma_client
 from chromadb.utils import embedding_functions
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger('RealEstateAgent')
 
 class RealEstateAgent(LLM_Agent):
     def __init__(self):
-        super().__init__("Real Estate Agent", self.system_instructions, "application/json")
+        logger.info("Initializing RealEstateAgent")
+        # Configure LLM parameters specifically for RealEstateAgent
+        temperature = 0.1  # Controls randomness (0.0 to 1.0)
+        top_p = 0.1       # Controls diversity via nucleus sampling
+        top_k = 5         # Controls diversity via top-k sampling
+        logger.info(f"Setting LLM parameters - temperature: {temperature}, top_p: {top_p}, top_k: {top_k}")
+        super().__init__("Real Estate Agent", self.system_instructions, "application/json", 
+                        temperature=temperature, top_p=top_p, top_k=top_k)
+        logger.info("RealEstateAgent initialization complete")
 
     system_instructions = """
 # Real Estate Listing Extractor
@@ -28,7 +43,9 @@ Extract key real estate information from provided text files and output structur
   * Extract and format the values into standardized formats:
     - waterTariff: Convert to "XX.XX TL/m³" format
     - naturalGasTariff: Convert to "XX.XX TL/m³" format
-    - electricityTariff: Convert to "XXXX TL/kWh" format
+    - electricityTariff: 
+      * If monthly price: Convert to "XXXX TL" format
+      * If per kWh price: Convert to "X.XXX TL/kWh" format
     - internetTariff: Convert to "XXX TL" format
   * If a specific tariff is not found in RAG results, set its value to null
   * Do not add any additional information or descriptions to the tariff fields
@@ -43,7 +60,7 @@ Each listing should be formatted as:
  "address": "location/address of the property",
  "waterTariff": "XX.XX TL/m³" or null,
  "naturalGasTariff": "XX.XX TL/m³" or null,
- "electricityTariff": "XXXX TL/kWh" or null,
+ "electricityTariff": "XXXX TL" or "X.XXX TL/kWh" or null,
  "internetTariff": "XXX TL" or null
 }
 
@@ -60,7 +77,7 @@ Output:
  "address": "Keçiören - Kanuni Mahallesi, Ankara",
  "waterTariff": "43.15 TL/m³",
  "naturalGasTariff": "8.34 TL/m³",
- "electricityTariff": "1456 TL/kWh",
+ "electricityTariff": "1456 TL",
  "internetTariff": "500 TL"
 }
 
@@ -75,7 +92,7 @@ Output:
  "address": "Etimesgut - Devlet Mahallesi, Ankara",
  "waterTariff": "43.15 TL/m³",
  "naturalGasTariff": "8.34 TL/m³",
- "electricityTariff": "1456 TL/kWh",
+ "electricityTariff": "1.456 TL/kWh",
  "internetTariff": "500 TL"
 }
 
@@ -90,7 +107,7 @@ Output:
  "address": "Beypazarı - Kurtuluş Mahallesi, Ankara",
  "waterTariff": "43.15 TL/m³",
  "naturalGasTariff": "8.34 TL/m³",
- "electricityTariff": "1456 TL/kWh",
+ "electricityTariff": "1456 TL",
  "internetTariff": "500 TL"
 }
 
@@ -107,35 +124,40 @@ LINKS_FILE_PATH = os.path.join(os.path.dirname(__file__), 'filtered_links.txt')
 
 def real_estate_agent_response(prompt, rag_results=None):
     try:
-        # Get keywords and search for links
-        keywords = parse_keywords(prompt)
-        print(f"Extracted keywords: {keywords}")
+        logger.info(f"Processing real estate agent response for prompt: {prompt[:100]}...")
         
+        # Get keywords and search for links
+        logger.info("Extracting keywords from prompt")
+        keywords = parse_keywords(prompt)
+        logger.info(f"Extracted keywords: {keywords}")
+        
+        logger.info("Searching for links")
         search_links = search(keywords)
         links = parse_search_links(search_links)
-        print(f"Found {len(links)} links")
+        logger.info(f"Found {len(links)} links")
         
+        logger.info("Filtering links")
         filtered_links = filter_links(links)
-        print(f"Filtered to {len(filtered_links)} links")
+        logger.info(f"Filtered to {len(filtered_links)} links")
         
         if not filtered_links:
+            logger.warning("No valid links found to crawl")
             return {"error": "No valid links found to crawl"}
             
         # Crawl the URLs
+        logger.info("Starting URL crawling")
         crawled_files = crawl_urls(filtered_links)
         if not crawled_files:
+            logger.warning("Failed to crawl any of the links")
             return {"error": "Failed to crawl any of the links"}
+        logger.info(f"Successfully crawled {len(crawled_files)} files")
             
         # Format the crawled content for the agent
         formatted_content = "\n\n".join(crawled_files)
         
         # Add RAG results to the prompt if available
         if rag_results:
-            print("\nRAG Results being added to prompt:")
-            print("-" * 40)
-            print(f"Number of RAG results: {len(rag_results)}")
-            print("-" * 40)
-            
+            logger.info(f"Adding {len(rag_results)} RAG results to prompt")
             # Format RAG results for the prompt
             rag_content = "\n\nCost of Living Information from RAG Results:\n"
             for result in rag_results:
@@ -146,77 +168,88 @@ def real_estate_agent_response(prompt, rag_results=None):
             
             full_prompt = f"{prompt}\n\n{rag_content}\n\nCrawled content:\n{formatted_content}"
         else:
-            print("\nNo RAG results available to add to prompt")
+            logger.info("No RAG results available")
             full_prompt = f"{prompt}\n\nCrawled content:\n{formatted_content}"
         
-        print("\nFull prompt being sent to agent:")
-        print("-" * 40)
-        print(full_prompt[:500] + "..." if len(full_prompt) > 500 else full_prompt)
-        print("-" * 40)
-        
+        logger.info(f"Generated full prompt of length: {len(full_prompt)} characters")
+        logger.info("Generating response from agent")
         response = real_estate_agent.generate_response(full_prompt)
+        logger.info("Response generated successfully")
         return response
     except Exception as e:
-        print(f"Error in real_estate_agent_response: {str(e)}")
+        logger.error(f"Error in real_estate_agent_response: {str(e)}")
         return {"error": f"An error occurred: {str(e)}"}
 
 def get_rag_results(location):
     """Get RAG results for cost of living information"""
     try:
+        logger.info(f"Getting RAG results for location: {location}")
+        
         # Initialize RAG components
         sentence_transformer_model = "distiluse-base-multilingual-cased-v1"
-        collection_name = "MyDocuments"  # Changed to match the collection name in RealEstateRAG.py
+        collection_name = "MyDocuments"
+        logger.info(f"Initializing RAG with model: {sentence_transformer_model}")
+        
         embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=sentence_transformer_model)
         chroma_client, chroma_collection = create_chroma_client(collection_name, embedding_function)
         
         # Show database information
-        print("\nDatabase Information:")
-        print("-" * 40)
-        print(f"Collection Name: {collection_name}")
-        print(f"Total Chunks: {chroma_collection.count()}")
-        print("-" * 40)
+        logger.info(f"Database Information - Collection: {collection_name}, Total Chunks: {chroma_collection.count()}")
         
         # Generate relevant queries
         queries = [
             f"{location} su tarifesi",
             f"{location} doğalgaz tarifesi",
-            "elektrik tarifesi",  # Removed location prefix for electricity
-            "internet tarifesi"   # Removed location prefix for internet
+            "elektrik tarifesi",
+            "internet tarifesi"
         ]
         
-        print("\n" + "="*80)
-        print("COST OF LIVING INFORMATION")
-        print("="*80)
+        logger.info(f"Generated queries: {queries}")
         
         all_results = []
         for query in queries:
-            print(f"\nQuerying: {query}")
+            logger.info(f"Querying: {query}")
             results = retrieveDocs(chroma_collection, query, n_results=3)
             show_results(results)
             all_results.extend(results)
+            logger.info(f"Found {len(results)} results for query: {query}")
             
+        logger.info(f"Total RAG results found: {len(all_results)}")
         return all_results
             
     except Exception as e:
-        print(f"Error getting RAG results: {str(e)}")
-        print("\nMake sure you have:")
-        print("1. Installed all required packages: pip install -r requirements.txt")
-        print("2. Have enough disk space for the ChromaDB database")
-        print("3. Have loaded some PDF documents into the RAG system")
+        logger.error(f"Error getting RAG results: {str(e)}")
+        logger.info("Make sure you have:")
+        logger.info("1. Installed all required packages: pip install -r requirements.txt")
+        logger.info("2. Have enough disk space for the ChromaDB database")
+        logger.info("3. Have loaded some PDF documents into the RAG system")
         return None
 
 if __name__ == "__main__":
     # Get the location from the search query
-    search_query = "Konya Kiralık Ev"
+    search_query = "ankara kiralık ev"
     location = search_query.split()[0]  # Get the first word as location
     
-    print("\n" + "="*80)
-    print("REAL ESTATE LISTINGS")
-    print("="*80)
+    logger.info(f"Starting real estate search for query: {search_query}")
+    logger.info(f"Location extracted: {location}")
     
     # Get RAG results for cost of living FIRST
+    logger.info("Getting RAG results for cost of living information")
     rag_results = get_rag_results(location)
     
     # Get real estate listings (crawling and response generation)
+    logger.info("Getting real estate listings")
     response = real_estate_agent_response(search_query, rag_results)
+    
+    # Get and display token usage statistics
+    usage_stats = real_estate_agent.get_usage_stats()
+    logger.info("\nToken Usage Statistics:")
+    logger.info("=" * 50)
+    logger.info(f"Total Input Tokens: {usage_stats['total_input_tokens']}")
+    logger.info(f"Total Output Tokens: {usage_stats['total_output_tokens']}")
+    logger.info(f"Total Cost: ${usage_stats['total_cost']:.6f}")
+    logger.info(f"Cost per Request: ${usage_stats['estimated_cost_per_request']:.6f}")
+    logger.info("=" * 50)
+    
+    logger.info("Response received, printing results")
     print(response.text)
