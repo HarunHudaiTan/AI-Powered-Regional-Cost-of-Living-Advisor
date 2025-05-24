@@ -1,6 +1,6 @@
 from google.genai import types
 
-class Public_Transport_Prices_Agent(Agent):
+class Public_Transport_Prices_Agent(LLM_Agent):
     system_instructions = ("""
         You are an agent that will receive public transportation price information of a city as a plain text string.
         You will give a JSON structured output as answer that has information of the transportation prices.
@@ -198,15 +198,13 @@ class Public_Transport_Prices_Agent(Agent):
         """          
     )
 
-    config = types.GenerateContentConfig(system_instruction=system_instructions,)
-
     def __init__(self):
-        super().__init__(self.config)
-
+        super().__init__(name="Public Transport Prices Agent", role=self.system_instructions, response_mime_type="application/json", temperature=0.2, top_p=1.0, top_k=0)
 
 def main():
+    rag_response = public_transport_rag_Response(query, city)[0]
     agent = Public_Transport_Prices_Agent()
-    response = agent.response("City Code: 41 | City: KOCAELİ (İZMİT) | Transportation: Otobüsler. Minibüsler | Price: Tam: 27 TL, İndirimli: 17.50 TL || Transportation: Tramvay | Price: Tam: 23 TL, İndirimli: 13.50 TL || Transportation: Deniz Ulaşımı | Price: Tam: 32 TL, İndirimli: 24 TL")
+    response = agent.generate_response(rag_response)
     print(response.text)
 
 main()
