@@ -111,10 +111,17 @@ class LLM_Market_Pipeline():
             if not batch_result:
                 print("Failed to parse market listings.")
                 return None
-            product_list_info.append(batch_result.text)
+            
+            # Append the text as a JSON to the info list
+            product_list_info.append(json.loads(batch_result.text))
 
+        #connect all the jsons into a single json by their "products" key
+        product_list_info = [item for sublist in product_list_info for item in sublist['products']]
+        
         return product_list_info
 
 pipeline = LLM_Market_Pipeline()
-response = pipeline.run_market_pipeline("")
-print(response)
+result = pipeline.run_market_pipeline("Get the product list from the market")
+#print it out in json format
+print("Final Result:")
+print(json.dumps(result, indent=4))
