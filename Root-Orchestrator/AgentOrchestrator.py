@@ -1,28 +1,25 @@
-
-from EducationAgent.Rag import EducationAgent as EducationAgent
+from EducationAgent.Rag.EducationAgent import EducationAgent
 from MarketAgent.proj_market_pipeline_agent import LLM_Market_Pipeline
-from Real_Estate_Agent import RealEstateAgent as RealEstateAgent
-from TransportationAgent.Transportation_Prices import Public_Transport_Prices_Agent as TransportationAgent
-from TransportationAgent import FuelPriceAgent as FuelPriceAgent
-from RootLLM import root_llm_response, RootLLM
+from Real_Estate_Agent.RealEstateAgent import RealEstateAgent
+from TransportationAgent.FuelPriceAgent import Fuel_Prices_Agent
 
-root_llm=RootLLM()
-MarketAgent=LLM_Market_Pipeline()
+market_agent=LLM_Market_Pipeline()
+fuel_price_agent=Fuel_Prices_Agent()
+real_estate_agent=RealEstateAgent()
+education_agent=EducationAgent()
+response1={'natural_response': 'Ankara Keçiören.', 'response_continue': 'STOP', 'action': {'action_number': 1, 'action_confidence': 0.9, 'city_name': 'Ankara Keçiören'}}
+def orchestrator_response(response):
 
-def orchestrator_response(prompt,root_llm):
-    response=root_llm.send_message(prompt)
     if response['response_continue'] =='STOP' :
         if response["action"]["action_number"] == 1:
-            print(RealEstateAgent.real_estate_agent_response(response['natural_response']))
+            print(real_estate_agent.search_real_estate(response['natural_response']))
         elif response["action"]["action_number"] == 2:
-           print( MarketAgent.run_market_pipeline(response['natural_response']))
+           print( market_agent.run_market_pipeline(response['natural_response']))
         elif response["action"]["action_number"] == 3:
-           print( EducationAgent.generate_response(response['natural_response']))
+           print( education_agent.generate_education_agent_response(response['natural_response']))
         elif response["action"]["action_number"] == 4:
-          print(TransportationAgent.generate_response(response['city_name']))
+          print(fuel_price_agent.generate_fuel_price(response['city_name']))
 
 
-while True:
-    promt=input(
-    )
-    orchestrator_response(promt)
+orchestrator_response(response1)
+

@@ -40,7 +40,7 @@ def convert_Chunk_Token(text_chunksinChar, sentence_transformer_model, chunk_ove
     print(f"\nTotal number of chunks (document split by {tokens_per_chunk} tokens per chunk): {len(text_chunksinTokens)}")
     return text_chunksinTokens
 
-def create_chroma_client(collection_name, embedding_function, persist_directory="./chroma_db"):
+def create_chroma_client(collection_name, embedding_function):
     """
     Create a persistent ChromaDB client and collection.
     
@@ -56,7 +56,7 @@ def create_chroma_client(collection_name, embedding_function, persist_directory=
     absolute_path = os.path.abspath(persist_directory)  # Get the absolute path
     print(f"ChromaDB will persist data in: {absolute_path}")  # Print it
     # Create a persistent client that stores data in the persist_directory
-    chroma_client = chromadb.PersistentClient(path=persist_directory)
+    chroma_client = chromadb.PersistentClient()
     chroma_collection = chroma_client.get_or_create_collection(collection_name, embedding_function=embedding_function)
     return chroma_client, chroma_collection
 

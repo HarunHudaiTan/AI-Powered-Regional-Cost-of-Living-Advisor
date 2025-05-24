@@ -1,6 +1,9 @@
-
-from KeywordAgent import KeywordAgent
 from proj_llm_agent import *
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
+import rag
+
 
 class EducationAgent(LLM_Agent):
     def __init__(self):
@@ -51,14 +54,12 @@ Your answer wil be
 DONT FORGET THAT ALL THESE JSON PAIRS ARE GOING TO BE FILLED FROM THE GIVEN CONTEXT 
     """
 
-import rag as rag
-education_agent=EducationAgent()
-def generate_response(prompt):
-    context=rag.rag_Response(prompt)
-    if isinstance(context, list):
-        context = "\n".join(context)
-    response = education_agent.generate_response("Question:"+prompt+"Context:"+context)
-    return response
 
-response=generate_response("Kocaeli Sağlık ve Teknoloji Diş hekimliği fiyatları ")
-print(response.text)
+
+    def generate_education_agent_response(self,prompt):
+        context=rag.rag_Response(prompt)
+        if isinstance(context, list):
+            context = "\n".join(context)
+        response = self.generate_response("Question:"+prompt+"Context:"+context)
+        return response.text
+

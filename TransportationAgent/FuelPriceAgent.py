@@ -1,11 +1,20 @@
 from google.genai import types
 import asyncio
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from proj_llm_agent import *
 from FuelPriceCrawler import fetch_fuel_prices
 from proj_llm_agent_2 import LLM_Agent2
 
 
 class Fuel_Prices_Agent(LLM_Agent):
+    def __init__(self):
+        super().__init__(name="Fuel Prices Agent", role=self.system_instructions, response_mime_type="application/json",
+                         temperature=0.2, top_p=1.0, top_k=0)
+
     system_instructions = ("""
         You are an agent that will receive fuel price information of a city as a markdown list.
         You will give a JSON structured output as answer that has information of the fuel prices.
@@ -438,17 +447,35 @@ class Fuel_Prices_Agent(LLM_Agent):
         """          
     )
 
-    def __init__(self):
-        super().__init__(name="Fuel Prices Agent", role=self.system_instructions, response_mime_type="application/json", temperature=0.2, top_p=1.0, top_k=0)
+    async def get_fuel_prices_response(self,city_name):
+        """
+        Fetch fuel prices for a given city and generate a response using the Fuel_Prices_Agent.
+
+        Args:
+            city_name (str): Name of the city to fetch fuel prices for
+
+        Returns:
+            str: Generated response text from the agent
+        """
+        markdown = await fetch_fuel_prices(city_name)
+        print(markdown)
+
+        agent = Fuel_Prices_Agent()
+        response = agent.generate_response(markdown)
+
+        return response.text
 
 
-# To run it (e.g., for "canakkale"):
-async def main():
-    markdown = await fetch_fuel_prices("istanbul")
-    print(markdown)
-    agent = Fuel_Prices_Agent()
-    response =  agent.generate_response(markdown)
-    print(response.text)
+    def generate_fuel_price(self,city_name="istanbul"):
+        """
+        Generate fuel price information for a given city.
 
-if __name__ == "__main__":
-    asyncio.run(main())
+        Args:
+            city_name (str): Name of the city to fetch fuel prices for. Defaults to "istanbul".
+
+        Returns:
+            str: Generated response text from the agent
+        """
+        result = asyncio.run(self.get_fuel_prices_response(city_name))
+        return result
+

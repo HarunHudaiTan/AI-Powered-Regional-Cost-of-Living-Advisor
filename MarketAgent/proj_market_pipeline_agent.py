@@ -1,8 +1,10 @@
-
 from proj_llm_agent_2 import LLM_Agent2
 from google import genai
 from google.genai import types
 
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
 
 from proj_market_crawl import crawl_urls
 from proj_market_parser import MarketParser
@@ -120,8 +122,3 @@ class LLM_Market_Pipeline():
         
         return product_list_info
 
-pipeline = LLM_Market_Pipeline()
-result = pipeline.run_market_pipeline("Get the product list from the market")
-#print it out in json format
-print("Final Result:")
-print(json.dumps(result, indent=4))

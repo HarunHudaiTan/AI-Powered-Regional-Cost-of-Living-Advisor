@@ -1,5 +1,5 @@
 from CreateChat import CreateChat
-from proj_llm_agent import LLM_Agent
+from AgentOrchestrator import orchestrator_response
 
 
 class RootLLM(CreateChat):
@@ -235,9 +235,18 @@ Only use these when the user has EXPLICITLY requested specific information:
 """
 
 
-def root_llm_response(prompt,root_llm):
-    response=root_llm.send_message(prompt)
-    return response
+    def root_llm_response(self,prompt):
+        response=self.send_message(prompt)
+        return response
+
+
+root_llm=RootLLM()
+
+while True:
+    response=root_llm.root_llm_response(input())
+    print(response)
+    orchestrator=orchestrator_response(response)
+    print(orchestrator)
 
 
 

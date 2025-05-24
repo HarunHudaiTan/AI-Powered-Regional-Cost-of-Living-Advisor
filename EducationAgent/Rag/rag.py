@@ -58,7 +58,8 @@ def convert_Chunk_Token(text_chunksinChar, sentence_transformer_model, chunk_ove
 
 # The rest of your embedding and collection logic remains the same
 sentence_transformer_model = "distiluse-base-multilingual-cased-v1"
-embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=sentence_transformer_model)
+# Remove global embedding function creation - move it to functions that need it
+# embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=sentence_transformer_model)
 
 
 def create_chroma_client(collection_name, embedding_function):
@@ -179,7 +180,7 @@ def load_multiple_pdfs_to_ChromaDB(collection_name, sentence_transformer_model):
     Returns:
         tuple: (chroma_client, chroma_collection)
     """
-    # Initialize embedding function
+    # Initialize embedding function only when needed
     embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=sentence_transformer_model)
 
     # Create or get ChromaDB client and collection
@@ -214,12 +215,15 @@ def load_multiple_pdfs_to_ChromaDB(collection_name, sentence_transformer_model):
 
 
 def get_existing_chroma_collection(collection_name):
-
+    # Create embedding function only when needed for existing collections
+    embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=sentence_transformer_model)
+    
     chroma_client = chromadb.PersistentClient()
 
     # Get the existing collection
     chroma_collection = chroma_client.get_collection(
-        name=collection_name
+        name=collection_name,
+        embedding_function=embedding_function
     )
 
     return  chroma_collection
