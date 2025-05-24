@@ -1,4 +1,5 @@
 from google.genai import types
+import asyncio
 
 class Fuel_Prices_Agent(Agent):
     system_instructions = ("""
@@ -433,13 +434,11 @@ class Fuel_Prices_Agent(Agent):
         """          
     )
 
-    config = types.GenerateContentConfig(system_instruction=system_instructions,)
-
-    def __init__(self):
-        super().__init__(self.config)
+def __init__(self):
+    super().__init__(name="Fuel Prices Agent", role=self.system_instructions, response_mime_type="application/json", temperature=0.2, top_p=1.0, top_k=0)
 
 
-# To run it (e.g., for Karabuk):
+# To run it (e.g., for "canakkale"):
 async def main():
     markdown = await fetch_fuel_prices("istanbul")
     print(markdown)
@@ -447,4 +446,5 @@ async def main():
     response = agent.response(markdown)
     print(response.text)
 
-await main()
+if __name__ == "__main__":
+    asyncio.run(main())
