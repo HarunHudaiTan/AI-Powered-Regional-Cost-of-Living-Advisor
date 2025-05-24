@@ -1,7 +1,9 @@
 from google.genai import types
 import asyncio
+from proj_llm_agent import *
+from FuelPriceCrawler import fetch_fuel_prices
 
-class Fuel_Prices_Agent(Agent):
+class Fuel_Prices_Agent(LLM_Agent):
     system_instructions = ("""
         You are an agent that will receive fuel price information of a city as a markdown list.
         You will give a JSON structured output as answer that has information of the fuel prices.
@@ -443,7 +445,7 @@ async def main():
     markdown = await fetch_fuel_prices("istanbul")
     print(markdown)
     agent = Fuel_Prices_Agent()
-    response = agent.response(markdown)
+    response =  agent.generate_response(markdown)
     print(response.text)
 
 if __name__ == "__main__":
