@@ -2,6 +2,8 @@ from google.genai import types
 import asyncio
 from proj_llm_agent import *
 from FuelPriceCrawler import fetch_fuel_prices
+from proj_llm_agent_2 import LLM_Agent2
+
 
 class Fuel_Prices_Agent(LLM_Agent):
     system_instructions = ("""
@@ -436,8 +438,8 @@ class Fuel_Prices_Agent(LLM_Agent):
         """          
     )
 
-def __init__(self):
-    super().__init__(name="Fuel Prices Agent", role=self.system_instructions, response_mime_type="application/json", temperature=0.2, top_p=1.0, top_k=0)
+    def __init__(self):
+        super().__init__(name="Fuel Prices Agent", role=self.system_instructions, response_mime_type="application/json", temperature=0.2, top_p=1.0, top_k=0)
 
 
 # To run it (e.g., for "canakkale"):

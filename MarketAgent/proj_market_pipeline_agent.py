@@ -2,8 +2,8 @@
 from proj_llm_agent_2 import LLM_Agent2
 from google import genai
 from google.genai import types
-from proj_search_func import search
-from proj_search_func import parse_search_results
+
+
 from proj_market_crawl import crawl_urls
 from proj_market_parser import MarketParser
 import asyncio

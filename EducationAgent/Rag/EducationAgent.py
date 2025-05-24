@@ -1,3 +1,4 @@
+from EducationAgent.Rag.rag import rag_Response
 from KeywordAgent import KeywordAgent
 from proj_llm_agent import *
 
@@ -50,7 +51,7 @@ Your answer wil be
 DONT FORGET THAT ALL THESE JSON PAIRS ARE GOING TO BE FILLED FROM THE GIVEN CONTEXT 
     """
 
-from rag import *
+
 education_agent=EducationAgent()
 def generate_response(prompt):
     context=rag_Response(prompt)
