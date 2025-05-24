@@ -4,6 +4,7 @@ from google.genai import types
 from proj_search_func import search
 from proj_search_func import parse_search_results
 from proj_market_crawl import crawl_urls
+from proj_market_parser import MarketParser
 import asyncio
 import json
 
@@ -66,7 +67,7 @@ class LLM_Market_Pipeline():
                 ),
             },
         )
-        self.market_parser = LLM_Agent(
+        self.market_parser = MarketParser(
             name = "Market Parser",
             role = 
             """You are a parse helper agent that is tasked to retrieve a products name its cost and the store page link it has.
@@ -76,10 +77,10 @@ class LLM_Market_Pipeline():
             Link.../banvit-pilic/...html
 
             You are meant to put the result in a structured JSON format""",
-            model = "gemini-2.0-flash",
+            model = "gemini-2.5-flash-preview-04-17",
             response_type = "application/json",
             response_schema = mp_schema,
-            temperature=0.95,
+            temperature=0.1,
             timebuffer=3
         )
 
@@ -103,6 +104,7 @@ class LLM_Market_Pipeline():
         product_list_info = []
         for batch in crawl_results:
             # Combine all the results in the batch into a single string
+            print(f"Parsing batch number: {crawl_results.index(batch) + 1}")
             batch_text = "\n".join([result for result in batch])
             batch_result = self.market_parser.generate_response(batch_text)
             if not batch_result:
@@ -112,3 +114,6 @@ class LLM_Market_Pipeline():
 
         return product_list_info
 
+pipeline = LLM_Market_Pipeline()
+response = pipeline.run_market_pipeline("")
+print(response)
