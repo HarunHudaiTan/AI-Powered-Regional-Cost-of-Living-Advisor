@@ -228,7 +228,7 @@ def get_rag_results(location):
 
 if __name__ == "__main__":
     # Get the location from the search query
-    search_query = "istanbul kiralık ev"
+    search_query = "konya kiralık ev"
     location = search_query.split()[0]  # Get the first word as location
     
     logger.info(f"Starting real estate search for query: {search_query}")

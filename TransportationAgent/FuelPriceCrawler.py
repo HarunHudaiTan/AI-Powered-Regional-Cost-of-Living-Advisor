@@ -42,4 +42,5 @@ async def main():
     markdown = await fetch_fuel_prices("istanbul")
     print(markdown)
 
-await main()
+if __name__ == "__main__":
+    asyncio.run(main())

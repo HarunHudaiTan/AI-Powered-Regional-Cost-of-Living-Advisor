@@ -1,3 +1,5 @@
+from transport_data import transport_data
+
 def transport_markdown_to_chunks(markdown_text: str):
   chunks = []
   lines = markdown_text.split('\n')
