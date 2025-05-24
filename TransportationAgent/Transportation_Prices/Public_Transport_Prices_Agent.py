@@ -1,4 +1,6 @@
 from google.genai import types
+from proj_llm_agent import *
+from Public_Transport_ChromaDB_Methods import public_transport_rag_Response
 
 class Public_Transport_Prices_Agent(LLM_Agent):
     system_instructions = ("""
@@ -202,6 +204,8 @@ class Public_Transport_Prices_Agent(LLM_Agent):
         super().__init__(name="Public Transport Prices Agent", role=self.system_instructions, response_mime_type="application/json", temperature=0.2, top_p=1.0, top_k=0)
 
 def main():
+    query = "İstanbula taşınmaya düşünüyorum."
+    city = "istanbul"
     rag_response = public_transport_rag_Response(query, city)[0]
     agent = Public_Transport_Prices_Agent()
     response = agent.generate_response(rag_response)
