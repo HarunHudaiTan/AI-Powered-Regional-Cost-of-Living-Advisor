@@ -8,6 +8,8 @@ import os
 from chromadb.utils import embedding_functions
 
 
+
+
 # Keep your PDF extraction function as is
 def convert_PDF_Text(pdf_path):
     reader = PdfReader(pdf_path)
@@ -125,10 +127,10 @@ def show_results(results, return_only_docs=False):
     else:
         retrieved_documents = results['documents'][0]
         metadatas = results['metadatas'][0]
-        
+
         if len(retrieved_documents) == 0:
             return []
-            
+
         # Format each document with source information
         formatted_docs = []
         for doc, metadata in zip(retrieved_documents, metadatas):
@@ -195,7 +197,7 @@ def load_multiple_pdfs_to_ChromaDB(collection_name, sentence_transformer_model):
 
         # Create character-based chunks first
         char_chunks = text_Chunks_in_Char(pdf_texts)
-        
+
         # Convert to token-based chunks
         token_chunks = convert_Chunk_Token(char_chunks, sentence_transformer_model)
 
@@ -214,12 +216,12 @@ def load_multiple_pdfs_to_ChromaDB(collection_name, sentence_transformer_model):
 def get_existing_chroma_collection(collection_name):
 
     chroma_client = chromadb.PersistentClient()
-    
+
     # Get the existing collection
     chroma_collection = chroma_client.get_collection(
         name=collection_name
     )
-    
+
     return  chroma_collection
 
 
