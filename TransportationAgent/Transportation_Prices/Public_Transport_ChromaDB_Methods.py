@@ -55,3 +55,9 @@ def get_existing_chroma_collection(collection_name):
     )
     
     return  chroma_collection
+
+
+def public_transport_rag_Response(query, city_name):
+    chroma_collection=get_existing_chroma_collection("Transportation_Prices")
+    retrieved_documents = retrieveDocs(chroma_collection, query, city_name, return_only_docs=True)
+    return retrieved_documents
