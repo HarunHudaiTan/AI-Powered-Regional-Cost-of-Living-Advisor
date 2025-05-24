@@ -1,4 +1,5 @@
-from proj_llm_agent import LLM_Agent
+
+from proj_llm_agent_2 import LLM_Agent2
 from google import genai
 from google.genai import types
 from proj_search_func import search
