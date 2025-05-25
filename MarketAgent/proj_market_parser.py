@@ -1,4 +1,4 @@
-from proj_llm_agent import LLM_Agent
+
 from google import genai
 from google.genai import types
 
@@ -26,21 +26,4 @@ class MarketParser(LLM_Agent2):
             system_instruction = [
                 types.Part.from_text(text=self.role),
             ],
-        )
-
-thing = MarketParser(
-            name = "Market Parser",
-            role = 
-            """You are a parse helper agent that is tasked to retrieve a products name its cost and the store page link it has.
-
-            When looking for the store page its more likely that its the link with the name of the product included. Example:
-            Name = Banvit Piliç
-            Link.../banvit-pilic/...html
-
-            You are meant to put the result in a structured JSON format""",
-            model = "gemini-2.5-flash-preview-04-17",
-            response_type = "application/json",
-            response_schema = None,
-            temperature=0.1,
-            timebuffer=3
         )

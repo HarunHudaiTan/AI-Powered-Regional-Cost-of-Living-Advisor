@@ -119,9 +119,3 @@ class LLM_Market_Pipeline():
         product_list_info = [item for sublist in product_list_info for item in sublist['products']]
         
         return product_list_info
-
-pipeline = LLM_Market_Pipeline()
-result = pipeline.run_market_pipeline("Get the product list from the market")
-#print it out in json format
-print("Final Result:")
-print(json.dumps(result, indent=4))

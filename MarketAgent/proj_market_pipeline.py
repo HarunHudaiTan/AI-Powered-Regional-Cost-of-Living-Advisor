@@ -1,13 +1,14 @@
-from proj_llm_agent import LLM_Agent
+from proj_llm_agent_2 import LLM_Agent2
 from google import genai
 from google.genai import types
 from proj_search_func import search
 from proj_search_func import parse_search_results
+from proj_market_parser import MarketParser
 from proj_market_crawl import crawl_urls
 import asyncio
 import json
 
-class LLM_Market_Pipeline():
+class LLM_Product_Pipeline():
 
     def __init__(self):
         mp_schema = genai.types.Schema(
@@ -34,7 +35,7 @@ class LLM_Market_Pipeline():
                 ),
             },
         )
-        self.market_parser = LLM_Agent(
+        self.market_parser = LLM_Agent2(
             name = "Market Parser",
             role = 
             """You are a parse helper agent that is tasked to retrieve a products name its cost and the store page link it has.
@@ -47,7 +48,7 @@ class LLM_Market_Pipeline():
             model = "gemini-2.0-flash",
             response_type = "application/json",
             response_schema = mp_schema,
-            temperature=0.95,
+            temperature=0.1,
             timebuffer=3
         )
 
@@ -63,7 +64,7 @@ class LLM_Market_Pipeline():
                 ),
             },
         )
-        self.market_keyword_generator = LLM_Agent(
+        self.market_keyword_generator = LLM_Agent2(
             name = "Market Keyword Generator",
             role = 
             """You are an agent that focuses on generating turkish keywords to search for grocery market items with.
@@ -72,56 +73,14 @@ class LLM_Market_Pipeline():
 
             Your output must always be in JSON format.
 
-            Try to have less or equal to 10 keywords.
+            You must generate a list of keywords of the product in the given prompt. Youre limited to 3 keywords max.
 
-            Try to reduce variants but if needed add them.Only add them if your list isnt full. For Example:
-            Red Meat = Lamb, Beef
+            Dont add duplicates.
 
             Your results for each item should be in a json array and for each shop item you will add \"akakce\" at the start""",
             model = "gemini-2.0-flash",
             response_type = "application/json",
             response_schema = mkg_schema,
-            temperature=0.95,
-            timebuffer=3
-        )
-
-        mpp_schema = genai.types.Schema(
-            type = genai.types.Type.OBJECT,
-            required = ["product_name", "product_cost", "product_stores"],
-            properties = {
-                "product_name": genai.types.Schema(
-                    type = genai.types.Type.STRING,
-                ),
-                "product_cost": genai.types.Schema(
-                    type = genai.types.Type.STRING,
-                ),
-                "product_stores": genai.types.Schema(
-                    type = genai.types.Type.ARRAY,
-                    items = genai.types.Schema(
-                        type = genai.types.Type.OBJECT,
-                        required = ["store_name", "store_cost"],
-                        properties = {
-                            "store_name": genai.types.Schema(
-                                type = genai.types.Type.STRING,
-                            ),
-                            "store_cost": genai.types.Schema(
-                                type = genai.types.Type.STRING,
-                            ),
-                        },
-                    ),
-                ),
-            },
-        )
-        self.market_product_parser = LLM_Agent(
-            name = "Market Keyword Generator",
-            role = 
-            """You are a parsing agent thats focused on retrieving a products name price and what stores its available on. 
-            The markdown youre provided with is on a singular product and you should focus on the said product. 
-            When writing down the store only write the store name. Nothing more
-            You need to write your output in a JSON format.""",
-            model = "gemini-2.0-flash",
-            response_type = "application/json",
-            response_schema = mpp_schema,
             temperature=0.95,
             timebuffer=3
         )
@@ -138,7 +97,7 @@ class LLM_Market_Pipeline():
                 ),
             },
         )
-        self.market_searcher = LLM_Agent(
+        self.market_searcher = LLM_Agent2(
             name = "Market Searcher",
             role = 
             """
@@ -158,8 +117,41 @@ class LLM_Market_Pipeline():
             timebuffer=3
         )
 
+        mv_schema = genai.types.Schema(
+            type = genai.types.Type.OBJECT,
+            required = ["should_retry", "wrong_tool"],
+            properties = {
+                "should_retry": genai.types.Schema(
+                    type = genai.types.Type.BOOLEAN,
+                ),
+                "wrong_tool": genai.types.Schema(
+                    type = genai.types.Type.BOOLEAN,
+                ),
+                "retry_reason": genai.types.Schema(
+                    type = genai.types.Type.STRING,
+                ),
+            },
+        )
 
-    def run_market_pipeline(self, prompt):
+        self.market_validator = LLM_Agent2(
+            name = "Market Validator",
+            role = 
+            """
+            You are a Validator Agent for Market Product Parsing. You will be given the prompt and the JSON return of the tool. Your objective is to determine if the products listed are related to the users query. Incase the tool response is insufficient the tool should be rerun. 
+
+            The tool youre attached to fetches information about grocery products. Incase the wrong tool was used you should specify wrong_tool accordingly.
+
+            You are to provide reasoning for your retry incase you choose to run the tool again. 
+            """,
+            model = "gemini-2.0-flash",
+            response_type = "application/json",
+            response_schema = mv_schema,
+            temperature=0.95,
+            timebuffer=3
+        )
+
+
+    def run_product_pipeline(self, prompt):
         """
         Run the entire market pipeline.
         """
@@ -188,20 +180,41 @@ class LLM_Market_Pipeline():
         parsed_results = self.market_searcher.generate_response(json.dumps(search_results, indent=2))
         if not parsed_results:
             print("Failed to parse search results.")
+            return None 
+
+        links = json.loads(parsed_results.text)['links']
+        #get rid of duplicates
+        links = list(set(links))
+        if not links:
+            print("No valid links found.")
             return None
 
-
-        crawl_results = asyncio.run(crawl_urls(parsed_results.parsed['links']))
+        crawl_results = asyncio.run(crawl_urls(links))
 
         if not crawl_results:
             print("Failed to crawl URLs.")
             return None
         
+
         # Step 4: Parse market listings
         print("Parsing market list...")
-        product_list_info = self.market_parser.generate_response(json.dumps(crawl_results, indent=1))
-    
+        product_list = self.market_parser.generate_response(json.dumps(crawl_results, indent=2))
+        product_list_info = json.loads(product_list.text)
 
-        print(product_list_info)
+        #step 5: Validate the product list
+        print("Validating product list...")
+        validation_result = self.market_validator.generate_response(
+            f"""user prompt: {prompt}
 
-        return product_list_info
+            tool response: {json.dumps(product_list_info, indent=4)}"""
+        )
+
+        if (json.loads(validation_result.text)['should_retry']):
+            print("Validation failed, retrying...")
+            retry_reason = json.loads(validation_result.text)['retry_reason']
+            print(f"Retry reason: {retry_reason}")
+            return self.run_product_pipeline(prompt)
+        
+        else:
+            print("Validation successful, returning product list.")
+            return json.dumps(product_list_info, indent=4)
