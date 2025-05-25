@@ -1,12 +1,16 @@
 import sys
 import os
 
+import chromadb
+
+from Real_Estate_Agent.Search import Search
+
 # Add current directory and parent directory to sys.path to ensure imports work
 sys.path.append(os.path.dirname(__file__))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from KeywordAgent import parse_keywords
-from Search import search, parse_search_links, filter_links
+
 from proj_llm_agent import LLM_Agent
 import logging
 # Import the crawling functions from Crawl.py
@@ -131,15 +135,18 @@ Note: Ensure all 10+ JSON objects are correctly formatted. If there aren't enoug
             # Get keywords and search for links
             logger.info("Extracting keywords from prompt")
             keywords = parse_keywords(prompt)
+            keyword_new= keywords[1:(len(keywords) - 1)]
+            print(keyword_new)
             logger.info(f"Extracted keywords: {keywords}")
 
             logger.info("Searching for links")
-            search_links = search(keywords)
-            links = parse_search_links(search_links)
+            search_func=Search()
+            search_links = search_func.search(keyword_new)
+            links = search_func.parse_search_links(search_links)
             logger.info(f"Found {len(links)} links")
 
             logger.info("Filtering links")
-            filtered_links = filter_links(links)
+            filtered_links = search_func.filter_links(links)
             logger.info(f"Filtered to {len(filtered_links)} links")
 
             if not filtered_links:
@@ -149,6 +156,7 @@ Note: Ensure all 10+ JSON objects are correctly formatted. If there aren't enoug
             # Crawl the URLs
             logger.info("Starting URL crawling")
             crawled_files = crawl_urls(filtered_links)
+            print(crawled_files)
             if not crawled_files:
                 logger.warning("Failed to crawl any of the links")
                 return {"error": "Failed to crawl any of the links"}
@@ -182,6 +190,26 @@ Note: Ensure all 10+ JSON objects are correctly formatted. If there aren't enoug
             logger.error(f"Error in real_estate_agent_response: {str(e)}")
             return {"error": f"An error occurred: {str(e)}"}
 
+    def get_existing_chroma_collection(self,collection_name):
+        # Create embedding function only when needed for existing collections
+        sentence_transformer_model = "distiluse-base-multilingual-cased-v1"
+        embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
+            model_name=sentence_transformer_model)
+
+        # Get the directory where this script is located
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        chroma_db_path = os.path.join(script_dir, "chroma_db")
+
+        chroma_client = chromadb.PersistentClient(path=chroma_db_path)
+
+        # Get the existing collection
+        chroma_collection = chroma_client.get_collection(
+            name=collection_name,
+            embedding_function=embedding_function
+        )
+
+        return chroma_collection
+
     def get_rag_results(self,location):
         """Get Real_Estate_RAG results for cost of living information"""
         try:
@@ -193,7 +221,7 @@ Note: Ensure all 10+ JSON objects are correctly formatted. If there aren't enoug
             logger.info(f"Initializing Real_Estate_RAG with model: {sentence_transformer_model}")
 
             embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=sentence_transformer_model)
-            chroma_client, chroma_collection = create_chroma_client(collection_name, embedding_function)
+            chroma_collection = self.get_existing_chroma_collection(collection_name)
 
             # Show database information
             logger.info(f"Database Information - Collection: {collection_name}, Total Chunks: {chroma_collection.count()}")
@@ -227,19 +255,16 @@ Note: Ensure all 10+ JSON objects are correctly formatted. If there aren't enoug
             logger.info("3. Have loaded some PDF documents into the Real_Estate_RAG system")
             return None
 
-    def search_real_estate(self,search_query):
+    def search_real_estate(self,search_query,city_name):
 
-        location = search_query.split()[0]  # Get the first word as location
+         # Get the first word as location
 
         logger.info(f"Starting real estate search for query: {search_query}")
-        logger.info(f"Location extracted: {location}")
-
+        logger.info(f"Location extracted: {city_name}")
 
         logger.info("Getting Real_Estate_RAG results for cost of living information")
-        rag_results = self.get_rag_results(location)
-
+        rag_results = self.get_rag_results(city_name)
 
         response = self.real_estate_agent_response(search_query, rag_results)
+        return response.text
 
-
-        return response

@@ -1,7 +1,7 @@
 import asyncio
 from crawl4ai import AsyncWebCrawler, CrawlerRunConfig, DefaultMarkdownGenerator
 
-async def fetch_fuel_prices(city: str) -> str:
+async def fetch_fuel_prices(city):
     """Fetches fuel prices for a certain Turkish city as markdown.
 
     Args:
@@ -37,10 +37,10 @@ async def fetch_fuel_prices(city: str) -> str:
 
 
 
-# To run it (e.g., for Karabuk):
-async def main():
-    markdown = await fetch_fuel_prices("istanbul")
-    print(markdown)
-
-if __name__ == "__main__":
-    asyncio.run(main())
+# # To run it (e.g., for Karabuk):
+# async def main():
+#     markdown = await fetch_fuel_prices("istanbul")
+#     print(markdown)
+#
+# if __name__ == "__main__":
+#     asyncio.run(main())

@@ -1,6 +1,5 @@
-
 from proj_llm_agent import *
-from Public_Transport_ChromaDB_Methods import public_transport_rag_Response
+from .Public_Transport_ChromaDB_Methods import public_transport_rag_Response
 from TransportationAgent import Transportation_City_Name_Formatter
 
 class Public_Transport_Prices_Agent(LLM_Agent):
@@ -204,7 +203,7 @@ class Public_Transport_Prices_Agent(LLM_Agent):
     )
 
 
-    def generate_response(self,city):
+    def generate_transport_price_response(self,city):
         query = ""
         city = Transportation_City_Name_Formatter.format_city_name(city)
         rag_response = public_transport_rag_Response(query, city)[0]

@@ -458,15 +458,14 @@ class Fuel_Prices_Agent(LLM_Agent):
             str: Generated response text from the agent
         """
         markdown = await fetch_fuel_prices(city_name)
-        print(markdown)
-
-        agent = Fuel_Prices_Agent()
-        response = agent.generate_response(markdown)
+        print(type(markdown))
+        print(self.gen_config)
+        response = self.generate_response(markdown)
 
         return response.text
 
 
-    def generate_fuel_price(self,city_name="istanbul"):
+    def generate_fuel_price(self,city_name):
         """
         Generate fuel price information for a given city.
 
@@ -476,6 +475,10 @@ class Fuel_Prices_Agent(LLM_Agent):
         Returns:
             str: Generated response text from the agent
         """
+        print("running generate price")
         result = asyncio.run(self.get_fuel_prices_response(city_name))
         return result
 
+
+# fuelprice=Fuel_Prices_Agent()
+# print(fuelprice.generate_fuel_price("istanbul"))

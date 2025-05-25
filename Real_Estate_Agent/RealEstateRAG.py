@@ -47,16 +47,16 @@ def create_chroma_client(collection_name, embedding_function):
     Args:
         collection_name (str): Name of the collection
         embedding_function: Function to create embeddings
-        persist_directory (str): Directory where ChromaDB stores its data
         
     Returns:
         tuple: (chroma_client, chroma_collection)
     """
-
-    absolute_path = os.path.abspath(persist_directory)  # Get the absolute path
-    print(f"ChromaDB will persist data in: {absolute_path}")  # Print it
-    # Create a persistent client that stores data in the persist_directory
-    chroma_client = chromadb.PersistentClient()
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    chroma_db_path = os.path.join(script_dir, "chroma")
+    
+    print(f"ChromaDB will persist data in: {chroma_db_path}")
+    chroma_client = chromadb.PersistentClient(path=chroma_db_path)
     chroma_collection = chroma_client.get_or_create_collection(collection_name, embedding_function=embedding_function)
     return chroma_client, chroma_collection
 
@@ -68,9 +68,13 @@ def show_database_info(chroma_client, collection_name):
         chroma_client: ChromaDB client
         collection_name (str): Name of the collection
     """
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    chroma_db_path = os.path.join(script_dir, "chroma")
+    
     print("\nDatabase Information:")
     print("-" * 40)
-    print(f"Database Location: {os.path.abspath('chroma_db')}")
+    print(f"Database Location: {chroma_db_path}")
     print(f"Collection Name: {collection_name}")
     print(f"Total Chunks: {chroma_client.get_collection(collection_name).count()}")
     print("-" * 40)
@@ -331,68 +335,5 @@ def delete_all_documents_from_collection(chroma_collection):
         print(f"Error deleting documents: {str(e)}")
         return 0
 
-if __name__ == "__main__":
-    # Example usage
-    collection_name = "MyDocuments"
-    sentence_transformer_model = "distiluse-base-multilingual-cased-v1"
-    
-    # Create embedding function and client first
-    embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=sentence_transformer_model)
-    chroma_client, chroma_collection = create_chroma_client(collection_name, embedding_function)
-    
-    # Show database information
-    show_database_info(chroma_client, collection_name)
-    
-    # Select PDF files
-    pdf_files = select_pdf_files()
-    
-    # Process new files if any were selected
-    if pdf_files:
-        print("\nLoading new PDFs into ChromaDB...")
-        try:
-            current_id = chroma_collection.count()
-            
-            # Process each selected PDF file
-            for file_path in pdf_files:
-                file_name = os.path.basename(file_path)
-                print(f"\nProcessing: {file_name}")
-                print(f"Current collection size: {chroma_collection.count()}")
-                
-                # Process the PDF
-                pdf_texts = convert_PDF_Text(file_path)
-                text_chunksinChar = convert_Page_ChunkinChar(pdf_texts)
-                text_chunksinTokens = convert_Chunk_Token(text_chunksinChar, sentence_transformer_model)
-                
-                # Add to collection
-                ids, metadatas = add_meta_data(text_chunksinTokens, file_name, "Selected Document", current_id)
-                current_id = current_id + len(text_chunksinTokens)
-                chroma_collection = add_document_to_collection(ids, metadatas, text_chunksinTokens, chroma_collection)
-                print(f"Added {file_name} to the collection")
-                
-            # Show updated database information after adding new files
-            show_database_info(chroma_client, collection_name)
-            
-        except Exception as e:
-            print(f"Error processing new files: {str(e)}")
-    
-    # Show current collection status
-    total_docs = chroma_collection.count()
-    if total_docs == 0:
-        print("\nNo documents in the collection. Please select some PDF files to process.")
-        exit(1)
-    else:
-        print(f"\nCurrent collection status: {total_docs} chunks from existing documents")
-    
-    # Run query on existing documents
-    try:
-        query = "Samsun su tarifesi"
-        print(f"\nQuerying with: {query}")
-        results = retrieveDocs(chroma_collection, query, n_results=5)
-        show_results(results)
-        
-    except Exception as e:
-        print(f"Error querying documents: {str(e)}")
-        print("\nMake sure you have:")
-        print("1. Installed all required packages: pip install -r requirements.txt")
-        print("2. Have enough disk space for the ChromaDB database")
+
 

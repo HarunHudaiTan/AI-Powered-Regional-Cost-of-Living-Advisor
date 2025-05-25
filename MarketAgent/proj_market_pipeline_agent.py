@@ -119,6 +119,6 @@ class LLM_Market_Pipeline():
 
         #connect all the jsons into a single json by their "products" key
         product_list_info = [item for sublist in product_list_info for item in sublist['products']]
-        
-        return product_list_info
+
+        return json.dumps(product_list_info, indent=4)
 

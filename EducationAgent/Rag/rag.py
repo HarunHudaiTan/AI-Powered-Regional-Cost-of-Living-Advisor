@@ -63,7 +63,11 @@ sentence_transformer_model = "distiluse-base-multilingual-cased-v1"
 
 
 def create_chroma_client(collection_name, embedding_function):
-    chroma_client = chromadb.PersistentClient()
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    chroma_db_path = os.path.join(script_dir, "chroma")
+    
+    chroma_client = chromadb.PersistentClient(path=chroma_db_path)
 
     # Check if collection already exists and delete it
     existing_collections = [col.name for col in chroma_client.list_collections()]
@@ -218,7 +222,11 @@ def get_existing_chroma_collection(collection_name):
     # Create embedding function only when needed for existing collections
     embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=sentence_transformer_model)
     
-    chroma_client = chromadb.PersistentClient()
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    chroma_db_path = os.path.join(script_dir, "chroma")
+    
+    chroma_client = chromadb.PersistentClient(path=chroma_db_path)
 
     # Get the existing collection
     chroma_collection = chroma_client.get_collection(
@@ -226,7 +234,7 @@ def get_existing_chroma_collection(collection_name):
         embedding_function=embedding_function
     )
 
-    return  chroma_collection
+    return chroma_collection
 
 
 from KeywordAgent import parse_university_keywords
