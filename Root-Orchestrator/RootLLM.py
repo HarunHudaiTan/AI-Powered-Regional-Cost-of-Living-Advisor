@@ -26,7 +26,8 @@ You have access to 4 specialized tools, each with a specific ID and function:
 | 1 | Real Estate Agent | Location name | JSON schema of real estate pricing data |
 | 2 | Grocery Pricing Agent | None | Array of JSON schemas for various product categories |
 | 3 | Education Pricing Agent | ONLY Specific university name | University pricing data as JSON |
-| 4 | Transport Pricing Agent | Location name | Gas prices and public transport fees as JSON |
+| 4 | Fuel Price Agent | Location name | Gas prices as JSON |
+| 5 | Public Transportation Agent | Location name | public transport fees as JSON |
 
 ## Response Format
 All responses must follow this JSON schema:
@@ -247,7 +248,7 @@ The `user_intent_turkish` field should be concise and direct:
 5. **Information Categories**: When users don't specify needs, inform them you can provide information about: Real Estate, Education, Market Prices, and Transportation
 6. **Tool Output Processing**: After receiving a STOP command and tool results, generate a natural, helpful response based on the data
 7. **Turkish Intent**: Always include a concise Turkish phrase in `user_intent_turkish` that directly describes what the user wants
-
+8.The next prompt after the stop condition will be the context of the context provided by the prompt and you must answer only by the given context
 ## Best Practices
 - Always match the user's language preference
 - Use the user's original phrasing in city_name when possible
@@ -262,27 +263,15 @@ The `user_intent_turkish` field should be concise and direct:
     def root_llm_response(self, message, history):
         try:
             response = self.send_message(message)
-            
-            # If response is already a string, return it as is
-            if isinstance(response, str):
-                try:
-                    # Try to parse as JSON to extract natural_response
-                    parsed_response = json.loads(response)
-                    if isinstance(parsed_response, dict) and "natural_response" in parsed_response and parsed_response.get("response_continue") == "CONTINUE":
-                        return parsed_response["natural_response"]
-                    else:
-                        # If it's a valid JSON but doesn't have natural_response, return the string as is
-                        return response
-                except json.JSONDecodeError:
-                    # If it's not valid JSON, return the string as is
-                    return response
-            
+
             # If response is already a dictionary
-            elif isinstance(response, dict):
+            if isinstance(response, dict):
                 if "natural_response" in response and response.get("response_continue") == "CONTINUE":
                     return response["natural_response"]
                 elif "natural_response" in response and response.get("response_continue") == "STOP":
-                    return orchestrator_response(response)
+                    summary=orchestrator_response(response)
+                    response = self.send_message(summary)
+                    return response["natural_response"]
             # For any other type, convert to string
             else:
                 return str(response)

@@ -40,12 +40,12 @@ class LLM_Agent:
         self.total_cost = 0.0
 
         # logger.info("Creating generation config")
-        self.gen_config = types.GenerateContentConfig(
-            response_mime_type=self.response_mime_type,
-            system_instruction=[
-                types.Part.from_text(text=self.role),
-            ],
-        )
+        # self.gen_config = types.GenerateContentConfig(
+        #     response_mime_type=self.response_mime_type,
+        #     system_instruction=[
+        #         types.Part.from_text(text=self.role),
+        #     ],
+        # )
         # logger.info("LLM_Agent initialization complete")
 
     def calculate_cost(self, input_chars, output_chars):
