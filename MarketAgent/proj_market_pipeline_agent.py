@@ -1,8 +1,10 @@
-
 from proj_llm_agent_2 import LLM_Agent2
 from google import genai
 from google.genai import types
 
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
 
 from proj_market_crawl import crawl_urls
 from proj_market_parser import MarketParser
@@ -16,32 +18,18 @@ class LLM_Market_Pipeline():
         self.website_list = [
             "https://www.akakce.com/kirmizi-et,1,2.html",
             "https://www.akakce.com/beyaz-et,1,2.html",
-            "https://www.akakce.com/sucuk,1,2.html",
-            "https://www.akakce.com/salam,1,2.html",
-            "https://www.akakce.com/sosis,1,2.html",
-            "https://www.akakce.com/ton-baligi,1,2.html",
             "https://www.akakce.com/yumurta,1,2.html",
             "https://www.akakce.com/peynir,1,2.html",
-            "https://www.akakce.com/bulyon,1,2.html",
-            "https://www.akakce.com/kemik-suyu,1,2.html",
-            "https://www.akakce.com/salca,1,2.html",
-            "https://www.akakce.com/ekmek,1,2.html",
-            "https://www.akakce.com/seker,1,2.html",
-            "https://www.akakce.com/un,1,2.html",
-            "https://www.akakce.com/kabartma-tozu,1,2.html",
-            "https://www.akakce.com/tereyagi,1,2.html",
-            "https://www.akakce.com/cikolata,1,2.html",
-            "https://www.akakce.com/bulgur,1,2.html",
-            "https://www.akakce.com/pirinc,1,2.html",
-            "https://www.akakce.com/makarna,1,2.html",
-            "https://www.akakce.com/sivi-yag,1,2.html",
-            "https://www.akakce.com/su,1,2.html",
-            "https://www.akakce.com/gazli-icecek,1,2.html",
-            "https://www.akakce.com/filtre-kahve,1,2.html",
-            "https://www.akakce.com/sivi-bulasik-deterjani,1,2.html",
-            "https://www.akakce.com/bulasik-makinesi-tableti,1,2.html",
-            "https://www.akakce.com/camasir-suyu,1,2.html",
-            "https://www.akakce.com/toz-deterjan,1,2.html"
+            # "https://www.akakce.com/ekmek,1,2.html",
+            # "https://www.akakce.com/pirinc,1,2.html",
+            # "https://www.akakce.com/makarna,1,2.html",
+            # "https://www.akakce.com/sivi-yag,1,2.html",
+            # "https://www.akakce.com/seker,1,2.html",
+            # "https://www.akakce.com/cay,1,2.html",
+            # "https://www.akakce.com/sivi-bulasik-deterjani,1,2.html",
+            # "https://www.akakce.com/toz-deterjan,1,2.html",
+            # "https://www.akakce.com/tuvalet-kagidi,1,2.html",
+            # "https://www.akakce.com/su.html"
         ]
 
         mp_schema = genai.types.Schema(
@@ -117,11 +105,6 @@ class LLM_Market_Pipeline():
 
         #connect all the jsons into a single json by their "products" key
         product_list_info = [item for sublist in product_list_info for item in sublist['products']]
-        
-        return product_list_info
 
-pipeline = LLM_Market_Pipeline()
-result = pipeline.run_market_pipeline("Get the product list from the market")
-#print it out in json format
-print("Final Result:")
-print(json.dumps(result, indent=4))
+        return json.dumps(product_list_info, indent=4)
+

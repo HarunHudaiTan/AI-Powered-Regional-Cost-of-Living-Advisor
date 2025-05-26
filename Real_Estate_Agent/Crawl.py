@@ -2,7 +2,7 @@ import asyncio
 from crawl4ai import AsyncWebCrawler, DefaultMarkdownGenerator
 from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig, CacheMode
 
-async def _crawl_urls_async(urls):
+async def crawl_urls_async(urls):
     """Internal async function to crawl a list of URLs"""
     md_generator = DefaultMarkdownGenerator(
         options={
@@ -56,4 +56,4 @@ def crawl_urls(urls):
     Returns:
         list: List of markdown contents from the crawled URLs
     """
-    return asyncio.run(_crawl_urls_async(urls))
+    return asyncio.run(crawl_urls_async(urls))
