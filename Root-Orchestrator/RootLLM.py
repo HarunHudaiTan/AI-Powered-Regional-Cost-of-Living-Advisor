@@ -297,7 +297,19 @@ Continue the chat according to the language used by the customer.
                     return response["natural_response"]
                 elif "natural_response" in response and response.get("response_continue") == "STOP":
                     summary=orchestrator_response(response)
-                    output_response = self.send_message("TOOL OUTPUT FROM " + tools[response["action"]["action_number"]] + " WITH INPUT " + response["action"]['city_name'] + " " + response['user_intent_turkish'] + ": \n" + summary)
+
+                    output_text = "TOOL OUTPUT FROM " + tools[response["action"]["action_number"]] + " WITH INPUT"
+
+                    if response["action"].get("city_name"):
+                        output_text += " " + response["action"]["city_name"]
+
+                    if response.get("user_intent_turkish"):
+                        output_text += " " + response["user_intent_turkish"]
+
+                    output_text += ": \n" + summary
+
+                    output_response = self.send_message(output_text)
+                    
                     return output_response["natural_response"]
             # For any other type, convert to string
             else:
@@ -305,6 +317,7 @@ Continue the chat according to the language used by the customer.
                 
         except Exception as e:
             # Return a user-friendly error message instead of crashing
+            raise(e)
             return f"I apologize, but I encountered an error while processing your request. Please try again. Error: {str(e)}"
 
 rootl_llm = RootLLM()
