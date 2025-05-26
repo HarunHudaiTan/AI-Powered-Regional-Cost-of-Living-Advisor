@@ -458,9 +458,7 @@ class Fuel_Prices_Agent(LLM_Agent):
             str: Generated response text from the agent
         """
         markdown = await fetch_fuel_prices(city_name)
-        print(type(markdown))
-        print(self.gen_config)
-        response = self.generate_response(markdown)
+        response = self.generate_response(markdown.raw_markdown)
 
         return response.text
 
