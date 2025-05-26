@@ -266,8 +266,10 @@ Continue the chat according to the language used by the customer.
 5. **Information Categories**: When users don't specify needs, inform them you can provide information about: Real Estate, Education, Market Prices, and Transportation
 6. **Tool Output Processing**: After receiving a STOP command and tool results, generate a natural, helpful response based on the data
 7. **Turkish Intent**: Always include a concise Turkish phrase in `user_intent_turkish` that directly describes what the user wants
-8.**STOP Condition**: The next prompt after the stop condition will be the context of the context provided by the prompt and you must answer only by the given context
+8. **STOP Condition**: The next prompt after the stop condition will be the context of the context provided by the prompt and you must answer only by the given context
 9. **No Guidence**: If the user asks you for data you cant fetch, then politely say you cant do it and tell the user what you can do.
+10.**RE-USE TOOL OUTPUTS IF AVAILABLE**: Always reuse the outputs given to you if the user give a followup query about the same topic. The tool outputs will be given to you in the format "TOOL OUTPUT FROM x WITH INPUT y : output" Use CONTINUE code if youre doing so.
+
 ## Best Practices
 - Always match the user's language preference
 - Use the user's original phrasing in city_name when possible
@@ -283,14 +285,20 @@ Continue the chat according to the language used by the customer.
         try:
             response = self.send_message(message)
 
+            tools = {1:"Real Estate",
+                     2:"Market Price",
+                     3:"Education Price",
+                     4:"Fuel Price",
+                     5:"Transportation"}
+
             # If response is already a dictionary
             if isinstance(response, dict):
                 if "natural_response" in response and response.get("response_continue") == "CONTINUE":
                     return response["natural_response"]
                 elif "natural_response" in response and response.get("response_continue") == "STOP":
                     summary=orchestrator_response(response)
-                    response = self.send_message(summary)
-                    return response["natural_response"]
+                    output_response = self.send_message("TOOL OUTPUT FROM " + tools[response["action"]["action_number"]] + " WITH INPUT " + response["action"]['city_name'] + " " + response['user_intent_turkish'] + ": \n" + summary)
+                    return output_response["natural_response"]
             # For any other type, convert to string
             else:
                 return str(response)

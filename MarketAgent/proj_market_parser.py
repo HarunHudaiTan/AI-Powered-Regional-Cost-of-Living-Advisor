@@ -2,7 +2,7 @@ from proj_llm_agent import LLM_Agent
 from google import genai
 from google.genai import types
 
-from proj_llm_agent_alt import LLM_Agent_Alt
+from proj_llm_agent import LLM_Agent_Alt
 
 
 class MarketParser(LLM_Agent_Alt):
