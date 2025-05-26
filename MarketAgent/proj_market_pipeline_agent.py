@@ -20,17 +20,16 @@ class LLM_Market_Pipeline():
             "https://www.akakce.com/beyaz-et,1,2.html",
             "https://www.akakce.com/yumurta,1,2.html",
             "https://www.akakce.com/peynir,1,2.html",
-            "https://www.akakce.com/ekmek,1,2.html",
-            "https://www.akakce.com/pirinc,1,2.html",
-            "https://www.akakce.com/makarna,1,2.html",
-            "https://www.akakce.com/sivi-yag,1,2.html",
-            "https://www.akakce.com/seker,1,2.html",
-            "https://www.akakce.com/cay,1,2.html",
-            "https://www.akakce.com/cikolata,1,2.html",
-            "https://www.akakce.com/sivi-bulasik-deterjani,1,2.html",
-            "https://www.akakce.com/toz-deterjan,1,2.html",
-            "https://www.akakce.com/tuvalet-kagidi,1,2.html",
-            "https://www.akakce.com/un,1,2.html"
+            # "https://www.akakce.com/ekmek,1,2.html",
+            # "https://www.akakce.com/pirinc,1,2.html",
+            # "https://www.akakce.com/makarna,1,2.html",
+            # "https://www.akakce.com/sivi-yag,1,2.html",
+            # "https://www.akakce.com/seker,1,2.html",
+            # "https://www.akakce.com/cay,1,2.html",
+            # "https://www.akakce.com/sivi-bulasik-deterjani,1,2.html",
+            # "https://www.akakce.com/toz-deterjan,1,2.html",
+            # "https://www.akakce.com/tuvalet-kagidi,1,2.html",
+            # "https://www.akakce.com/su.html"
         ]
 
         mp_schema = genai.types.Schema(
