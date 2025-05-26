@@ -7,28 +7,17 @@ market_agent=LLM_Market_Pipeline()
 fuel_price_agent=Public_Transport_Prices_Agent()
 real_estate_agent=RealEstateAgent()
 education_agent=EducationAgent()
-# response1={
-#   "action": {
-#     "action_confidence": 0.9,
-#     "action_number": 4,
-#     "city_name": "ankara"
-#   },
-#   "natural_response": "Let me get the real estate pricing information for Ankara, specifically the Keçiören district.",
-#   "response_continue": "STOP",
-#   "user_intent_turkish": "Ankara Keçiören emlak fiyatları"
-# }
 def orchestrator_response(response):
 
     if response['response_continue'] =='STOP' :
         if response["action"]["action_number"] == 1:
-            print(real_estate_agent.search_real_estate(response['user_intent_turkish'],response["action"]['city_name']))
+           return real_estate_agent.search_real_estate(response['user_intent_turkish'],response["action"]['city_name'])
         elif response["action"]["action_number"] == 2:
-           print( market_agent.run_market_pipeline(response['user_intent_turkish']))
+           return market_agent.run_market_pipeline(response['user_intent_turkish'])
         elif response["action"]["action_number"] == 3:
-           print( education_agent.generate_education_agent_response(response['user_intent_turkish']))
+          return education_agent.generate_education_agent_response(response['user_intent_turkish'])
         elif response["action"]["action_number"] == 4:
-            print(response["action"]['city_name'])
-            print(fuel_price_agent.generate_transport_price_response(response["action"]['city_name']))
+            return fuel_price_agent.generate_transport_price_response(response["action"]['city_name'])
 
 
 # orchestrator_response(response1)

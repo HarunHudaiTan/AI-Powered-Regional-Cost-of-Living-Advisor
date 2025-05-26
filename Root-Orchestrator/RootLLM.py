@@ -1,6 +1,7 @@
 from CreateChat import CreateChat
 from AgentOrchestrator import orchestrator_response
-
+import json
+from AgentOrchestrator import orchestrator_response
 
 class RootLLM(CreateChat):
     def __init__(self):
@@ -257,18 +258,46 @@ The `user_intent_turkish` field should be concise and direct:
 """
 
 
-    def root_llm_response(self,prompt):
-        response=self.send_message(prompt)
-        return response
+    def root_llm_response(self, message, history):
+        try:
+            response = self.send_message(message)
+            
+            # If response is already a string, return it as is
+            if isinstance(response, str):
+                try:
+                    # Try to parse as JSON to extract natural_response
+                    parsed_response = json.loads(response)
+                    if isinstance(parsed_response, dict) and "natural_response" in parsed_response and parsed_response.get("response_continue") == "CONTINUE":
+                        return parsed_response["natural_response"]
+                    else:
+                        # If it's a valid JSON but doesn't have natural_response, return the string as is
+                        return response
+                except json.JSONDecodeError:
+                    # If it's not valid JSON, return the string as is
+                    return response
+            
+            # If response is already a dictionary
+            elif isinstance(response, dict):
+                if "natural_response" in response and response.get("response_continue") == "CONTINUE":
+                    return response["natural_response"]
+                elif "natural_response" in response and response.get("response_continue") == "STOP":
+                    return orchestrator_response(response)
+            # For any other type, convert to string
+            else:
+                return str(response)
+                
+        except Exception as e:
+            # Return a user-friendly error message instead of crashing
+            return f"I apologize, but I encountered an error while processing your request. Please try again. Error: {str(e)}"
 
-
-root_llm=RootLLM()
-
-while True:
-    response=root_llm.root_llm_response(input())
-    print(response)
-    orchestrator=orchestrator_response(response)
-    print(orchestrator)
-
+rootl_llm = RootLLM()
+import gradio as gr
+demo = gr.ChatInterface(
+    fn=rootl_llm.root_llm_response,
+    type="messages",
+    title="Large Language Model Demo",
+    description="Enter a sentence or paragraph to generate a response",
+)
+demo.launch()
 
 
