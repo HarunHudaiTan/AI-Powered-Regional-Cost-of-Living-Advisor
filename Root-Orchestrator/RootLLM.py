@@ -309,7 +309,7 @@ Continue the chat according to the language used by the customer.
                     output_text += ": \n" + summary
 
                     output_response = self.send_message(output_text)
-                    
+
                     return output_response["natural_response"]
             # For any other type, convert to string
             else:
@@ -317,7 +317,7 @@ Continue the chat according to the language used by the customer.
                 
         except Exception as e:
             # Return a user-friendly error message instead of crashing
-            raise(e)
+            #raise(e)
             return f"I apologize, but I encountered an error while processing your request. Please try again. Error: {str(e)}"
 
 rootl_llm = RootLLM()
