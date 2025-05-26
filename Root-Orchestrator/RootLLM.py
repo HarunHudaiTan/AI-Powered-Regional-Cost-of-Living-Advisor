@@ -96,9 +96,10 @@ Only use these when the user has EXPLICITLY requested specific information:
 - Example: "What are the costs for Ankara University?"
 - Example: "Tell me about Bogazici University fees"
 
-**Tool 4 (Transport)**: User specifically asks about gas prices, public transport, transportation costs
+**Tool 4 (Fuel Price)**: User specifically asks about gas prices
 - Example: "What are gas prices in Antalya?"
-- Example: "How much does public transport cost?"
+**Tool 5 (Public Transport Prices)**: User specifically asks about public transportation prices
+- Example: "What are public transportation prices in Antalya?"
 
 ## Tool Usage Examples
 

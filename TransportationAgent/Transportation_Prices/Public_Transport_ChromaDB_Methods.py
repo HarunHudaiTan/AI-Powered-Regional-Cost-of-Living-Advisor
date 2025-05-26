@@ -1,4 +1,7 @@
+import os
+
 import chromadb
+from chromadb.utils import embedding_functions
 from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
 
 
@@ -45,17 +48,25 @@ def retrieveDocs(chroma_collection, query, city_name, n_results=1, return_only_d
         return results
 
 
-def get_existing_chroma_collection(collection_name):
+def get_existing_chroma_collection( collection_name):
+    # Create embedding function only when needed for existing collections
+    sentence_transformer_model = "distiluse-base-multilingual-cased-v1"
+    embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
+        model_name=sentence_transformer_model)
 
-    chroma_client = chromadb.PersistentClient()
-    
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    chroma_db_path = os.path.join(script_dir, "chroma")
+
+    chroma_client = chromadb.PersistentClient(path=chroma_db_path)
+
     # Get the existing collection
     chroma_collection = chroma_client.get_collection(
-        name=collection_name
+        name=collection_name,
+        embedding_function=embedding_function
     )
-    
-    return  chroma_collection
 
+    return chroma_collection
 
 def public_transport_rag_Response(query, city_name):
     chroma_collection=get_existing_chroma_collection("Transportation_Prices")
