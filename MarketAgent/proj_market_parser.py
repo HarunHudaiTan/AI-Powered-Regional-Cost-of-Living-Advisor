@@ -2,10 +2,10 @@ from proj_llm_agent import LLM_Agent
 from google import genai
 from google.genai import types
 
-from proj_llm_agent_2 import LLM_Agent2
+from proj_llm_agent_alt import LLM_Agent_Alt
 
 
-class MarketParser(LLM_Agent2):
+class MarketParser(LLM_Agent_Alt):
 
     def __init__(self, name, role, model = "gemini-2.5-flash-preview-04-17", response_type = "text/plain", response_schema = None,tools = [], temperature=0.95,timebuffer=3):
         self.name = name

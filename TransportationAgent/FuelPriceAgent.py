@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from proj_llm_agent import *
 from FuelPriceCrawler import fetch_fuel_prices
-from proj_llm_agent_2 import LLM_Agent2
+from proj_llm_agent_alt import LLM_Agent2
 
 
 class Fuel_Prices_Agent(LLM_Agent):

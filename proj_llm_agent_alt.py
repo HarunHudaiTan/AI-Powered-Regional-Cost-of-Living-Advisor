@@ -4,7 +4,7 @@ from google import genai
 from google.genai import types
 from google.genai.errors import ClientError
 
-class LLM_Agent2:
+class LLM_Agent_Alt:
     def __init__(self, name, role, model="gemini-2.0-flash", response_type="text/plain", response_schema=None, tools=[],
                  temperature=0.95, timebuffer=3):
         self.name = name
