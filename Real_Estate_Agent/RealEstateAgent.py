@@ -64,6 +64,7 @@ Extract key real estate information from provided text files and output structur
 ## Output Format:
 Each listing should be formatted as:
 {
+    
  "price": "price with currency",
  "room": "room configuration (e.g., 2+1, 3+1)",
  "sqmeter": "size in square meters",

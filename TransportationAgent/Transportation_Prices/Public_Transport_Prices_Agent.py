@@ -209,5 +209,5 @@ class Public_Transport_Prices_Agent(LLM_Agent):
         rag_response = public_transport_rag_Response(query, city)[0]
         agent = Public_Transport_Prices_Agent()
         response = agent.generate_response(rag_response)
-        print(response.text)
+        return response.text
 
