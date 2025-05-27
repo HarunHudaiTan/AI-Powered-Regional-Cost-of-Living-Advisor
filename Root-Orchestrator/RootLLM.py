@@ -299,60 +299,57 @@ Continue the chat according to the language used by the customer.
         if not self.user_info:
             return "Please fill out the user information form first."
 
-        try:
-            # Create a more detailed context with user information
-            context = f"""User Information:
-            Name: {self.user_info['name']}
-            Monthly Salary: {self.user_info['monthly_salary']} TL
-            Family Size: {self.user_info['family_size']} persons
-            Current City: {self.user_info['current_city']}"""
+        # Create a more detailed context with user information
+        context = f"""User Information:
+        Name: {self.user_info['name']}
+        Monthly Salary: {self.user_info['monthly_salary']} TL
+        Family Size: {self.user_info['family_size']} persons
+        Current City: {self.user_info['current_city']}"""
 
-            if self.user_info['target_city']:
-                context += f"\nTarget City: {self.user_info['target_city']}"
+        if self.user_info['target_city']:
+            context += f"\nTarget City: {self.user_info['target_city']}"
 
-            context += f"\n\nPrevious conversation history:\n"
-            for user_msg, bot_msg in history:
-                context += f"User: {user_msg}\nAssistant: {bot_msg}\n"
+        context += f"\n\nPrevious conversation history:\n"
+        for user_msg, bot_msg in history:
+            context += f"User: {user_msg}\nAssistant: {bot_msg}\n"
 
-            context += f"\nCurrent user message: {message}"
+        context += f"\nCurrent user message: {message}"
 
-            response = self.send_message(context)
+        response = self.send_message(context)
 
-            tools = {1:"Real Estate",
-                     2:"Market Price",
-                     3:"Education Price",
-                     4:"Fuel Price",
-                     5:"Transportation"}
+        tools = {1:"Real Estate",
+                 2:"Market Price",
+                 3:"Education Price",
+                 4:"Fuel Price",
+                 5:"Transportation"}
 
-            # If response is already a dictionary
-            if isinstance(response, dict):
-                if "natural_response" in response and response.get("response_continue") == "CONTINUE":
-                    print(response)
-                    return response["natural_response"]
+        # If response is already a dictionary
+        if isinstance(response, dict):
+            if "natural_response" in response and response.get("response_continue") == "CONTINUE":
+                print(response)
+                return response["natural_response"]
 
-                elif "natural_response" in response and response.get("response_continue") == "STOP":
-                    summary=orchestrator_response(response)
-                    print("Summary agent response"+summary)
-                    output_text = "TOOL OUTPUT FROM " + tools[response["action"]["action_number"]] + " WITH INPUT"
+            elif "natural_response" in response and response.get("response_continue") == "STOP":
+                summary=orchestrator_response(response)
+                print("Summary agent response"+summary)
+                output_text = "TOOL OUTPUT FROM " + tools[response["action"]["action_number"]] + " WITH INPUT"
 
-                    if response["action"].get("city_name"):
-                        output_text += " " + response["action"]["city_name"]
+                if response["action"].get("city_name"):
+                    output_text += " " + response["action"]["city_name"]
 
-                    if response.get("user_intent_turkish"):
-                        output_text += " " + response["user_intent_turkish"]
+                if response.get("user_intent_turkish"):
+                    output_text += " " + response["user_intent_turkish"]
 
-                    output_text += ": \n" + summary
+                output_text += ": \n" + summary
 
-                    output_response = self.send_message(summary)
-                    print(output_response)
+                output_response = self.send_message(summary)
+                print(output_response)
 
-                    return output_response["natural_response"]
-            # For any other type, convert to string
-            else:
-                return str(response)
+                return output_response["natural_response"]
+        # For any other type, convert to string
+        else:
+            return str(response)
 
-        except Exception as e:
-            return f"I apologize, but I encountered an error while processing your request. Please try again. Error: {str(e)}"
 
 rootl_llm = RootLLM()
 
@@ -554,7 +551,7 @@ def submit_user_info(name, salary, family_size, current_city, target_city):
     # Create welcome message with user info
     welcome_message = f"""👋 Merhaba {name}! I'm your Turkish Regional Cost of Living Advisor.
 
-I understand you're currently living in {current_city} with a monthly salary of {salary:,} TL and a family size of {family_size} people."""
+I understand you're currently living in {current_city} with a monthly salary of {salary} TL and a family size of {family_size} people."""
 
     if target_city:
         welcome_message += f"\n\nI see you're interested in {target_city}. That's a great choice!"
