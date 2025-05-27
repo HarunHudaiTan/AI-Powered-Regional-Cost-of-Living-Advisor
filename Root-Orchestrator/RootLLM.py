@@ -433,6 +433,16 @@ universiteler = [
     "Ankara - Yüksek İhtisas Üniversitesi"
 ]
 
+# Create a dictionary of universities by city
+universities_by_city = {}
+for uni in universiteler:
+    city, university = uni.split(" - ")
+    if city not in universities_by_city:
+        universities_by_city[city] = []
+    universities_by_city[city].append(uni)
+
+# Get list of cities that have universities
+university_cities = sorted(list(universities_by_city.keys()))
 
 def create_user_info_form():
     with gr.Blocks() as form:
@@ -460,10 +470,23 @@ def create_user_info_form():
 
 def create_chat_interface():
     with gr.Blocks() as chat:
-        chatbot = gr.Chatbot()
-        msg = gr.Textbox(label="Message", placeholder="Type your message here...")
-        clear = gr.Button("Clear")
-        return chat, chatbot, msg, clear
+        chatbot = gr.Chatbot(
+            elem_id="chatbot",
+            height=600,
+            show_copy_button=True,
+            bubble_full_width=False,
+            show_label=False,
+        )
+        with gr.Row():
+            msg = gr.Textbox(
+                label="Message",
+                placeholder="Type your message and press Enter or click Send...",
+                show_label=False,
+                container=False,
+                scale=9,
+            )
+            submit = gr.Button("Send", variant="primary", scale=1)
+        return chat, chatbot, msg, submit
 
 def show_agent_selector():
     return gr.update(visible=True)
@@ -472,7 +495,14 @@ def hide_agent_selector():
     return gr.update(visible=False)
 
 def show_university_dropdown(agent_name):
-    return gr.update(visible=agent_name == "Education Pricing Agent")
+    if agent_name == "Education Pricing Agent":
+        return gr.update(visible=True), gr.update(visible=False)
+    return gr.update(visible=False), gr.update(visible=False)
+
+def update_university_list(city):
+    if city:
+        return gr.update(choices=universities_by_city[city], visible=True)
+    return gr.update(choices=[], visible=False)
 
 def select_agent(agent_name, message, university, history):
     if not agent_name:
@@ -490,21 +520,44 @@ def select_agent(agent_name, message, university, history):
 
 def submit_user_info(name, salary, family_size, current_city, target_city):
     if not all([name, salary, family_size, current_city]):
-        return "Please fill out all required fields.", gr.update(visible=True), gr.update(visible=False), gr.update(visible=False)
+        return "Please fill out all required fields.", gr.update(visible=True), gr.update(visible=False), gr.update(visible=False), []
     
     context = rootl_llm.set_user_info(name, salary, family_size, current_city, target_city)
-    return "User information submitted successfully! You can now start chatting.", gr.update(visible=False), gr.update(visible=True), gr.update(visible=True)
+    
+    # Create welcome message with user info
+    welcome_message = f"""👋 Merhaba {name}! I'm your Turkish Regional Cost of Living Advisor.
+
+I understand you're currently living in {current_city} with a monthly salary of {salary:,} TL and a family size of {family_size} people."""
+
+    if target_city:
+        welcome_message += f"\n\nI see you're interested in {target_city}. That's a great choice!"
+    
+    welcome_message += """
+
+I can help you with detailed information about:
+• 🏠 Real Estate prices and rental costs
+• 🛒 Grocery and market prices
+• 🎓 Education costs and university fees
+• ⛽ Fuel prices
+• 🚌 Public transportation costs
+
+What would you like to know more about?"""
+
+    # Initialize chat history with welcome message
+    chat_history = [("", welcome_message)]
+    
+    return "User information submitted successfully!", gr.update(visible=False), gr.update(visible=True), gr.update(visible=True), chat_history
 
 def chat_response(message, history):
     if not message:
-        return history
+        return history, ""
     
     # Get response from LLM
     response = rootl_llm.root_llm_response(message, history)
     
     # Append the new message and response to history
     history.append((message, response))
-    return history
+    return history, ""
 
 with gr.Blocks() as demo:
     gr.Markdown("# Turkish Regional Cost of Living Advisor")
@@ -531,8 +584,14 @@ with gr.Blocks() as demo:
                     label="Agent",
                     info="Select the agent you want to use"
                 )
+                university_city_dropdown = gr.Dropdown(
+                    choices=university_cities,
+                    label="Select City",
+                    info="Select a city to see its universities",
+                    visible=False
+                )
                 university_dropdown = gr.Dropdown(
-                    choices=universiteler,
+                    choices=[],
                     label="Select University",
                     info="Select a university for education pricing",
                     visible=False
@@ -546,30 +605,38 @@ with gr.Blocks() as demo:
         
         # Right column - Chat interface
         with gr.Column(scale=2, visible=False) as chat_column:
-            chat, chatbot, msg, clear = create_chat_interface()
+            chat, chatbot, msg, submit = create_chat_interface()
     
     # Handle form submission
     submit_btn.click(
         submit_user_info,
         inputs=[name, salary, family_size, current_city, target_city],
-        outputs=[status, form_section, agent_section, chat_column]
+        outputs=[status, form_section, agent_section, chat_column, chatbot]
     )
     
     # Handle chat
     msg.submit(
         chat_response,
         inputs=[msg, chatbot],
-        outputs=[chatbot]
-    ).then(
-        lambda: "",
-        None,
-        [msg]
+        outputs=[chatbot, msg]
+    )
+    
+    submit.click(
+        chat_response,
+        inputs=[msg, chatbot],
+        outputs=[chatbot, msg]
     )
     
     # Handle agent selection
     agent_dropdown.change(
         show_university_dropdown,
         inputs=[agent_dropdown],
+        outputs=[university_city_dropdown, university_dropdown]
+    )
+    
+    university_city_dropdown.change(
+        update_university_list,
+        inputs=[university_city_dropdown],
         outputs=[university_dropdown]
     )
     
@@ -578,8 +645,6 @@ with gr.Blocks() as demo:
         inputs=[agent_dropdown, agent_message, university_dropdown, chatbot],
         outputs=[chatbot, agent_message]
     )
-    
-    clear.click(lambda: None, None, chatbot, queue=False)
 
 demo.launch()
 
