@@ -1,13 +1,11 @@
 from CreateChat import CreateChat
-from AgentOrchestrator import orchestrator_response
-import json
+
 from AgentOrchestrator import orchestrator_response
 
 class RootLLM(CreateChat):
     def __init__(self):
         super().__init__(name="ROOT AGENT", role=self.system_instructions, response_mime_type="application/json")
         self.user_info = None
-
     system_instructions="""
 # Turkish Regional Cost of Living Advisor System Prompt
 
@@ -180,7 +178,7 @@ The `user_intent_turkish` field should be concise and direct:
 - **Grocery**: "Market fiyatları", "Gıda maliyetleri"
 - **Education**: "Boğaziçi Üniversitesi ücretleri", "Eğitim maliyetleri"
 - **Transport**: "Ankara ulaşım maliyetleri", "Benzin fiyatları"
-- **General**: "Genel yaşam maliyeti bilgisi", "Yardım talebi"
+- **General**: "Genel yaşam maliyeti bilgisi"
 
 ## Language-Specific Examples
 
@@ -268,11 +266,13 @@ Continue the chat according to the language used by the customer.
 6. **Tool Output Processing**: After receiving a STOP command and tool results, generate a natural, helpful response based on the data
 7. **Turkish Intent**: Always include a concise Turkish phrase in `user_intent_turkish` that directly describes what the user wants
 8. **STOP Condition**: The next prompt after the stop condition will be the context of the context provided by the prompt and you must answer only by the given context
-9. **No Guidence**: If the user asks you for data you cant fetch, then politely say you cant do it and tell the user what you can do.
-10.**RE-USE TOOL OUTPUTS IF AVAILABLE**: Always reuse the outputs given to you if the user give a followup query about the same topic. The tool outputs will be given to you in the format "TOOL OUTPUT FROM x WITH INPUT y : output" Use CONTINUE code if youre doing so.
-
+9.After the stop condition if the context is about
+10. **No Guidence**: If the user asks you for data you cant fetch, then politely say you cant do it and tell the user what you can do.
+11.**RE-USE TOOL OUTPUTS IF AVAILABLE**: Always reuse the outputs given to you if the user give a followup query about the same topic. The tool outputs will be given to you in the format "TOOL OUTPUT FROM x WITH INPUT y : output" Use CONTINUE code if youre doing so.
+12.After reviewing the context for real estate always write links after the information
 ## Best Practices
 - Always match the user's language preference
+- When users says hi call user by his name. 
 - Use the user's original phrasing in city_name when possible
 - Be conversational and helpful rather than robotic
 - Guide users naturally toward the information they need
@@ -298,14 +298,14 @@ Continue the chat according to the language used by the customer.
     def root_llm_response(self, message, history):
         if not self.user_info:
             return "Please fill out the user information form first."
-            
+
         try:
             # Create a more detailed context with user information
             context = f"""User Information:
-Name: {self.user_info['name']}
-Monthly Salary: {self.user_info['monthly_salary']} TL
-Family Size: {self.user_info['family_size']} persons
-Current City: {self.user_info['current_city']}"""
+            Name: {self.user_info['name']}
+            Monthly Salary: {self.user_info['monthly_salary']} TL
+            Family Size: {self.user_info['family_size']} persons
+            Current City: {self.user_info['current_city']}"""
 
             if self.user_info['target_city']:
                 context += f"\nTarget City: {self.user_info['target_city']}"
@@ -327,10 +327,12 @@ Current City: {self.user_info['current_city']}"""
             # If response is already a dictionary
             if isinstance(response, dict):
                 if "natural_response" in response and response.get("response_continue") == "CONTINUE":
+                    print(response)
                     return response["natural_response"]
+
                 elif "natural_response" in response and response.get("response_continue") == "STOP":
                     summary=orchestrator_response(response)
-
+                    print("Summary agent response"+summary)
                     output_text = "TOOL OUTPUT FROM " + tools[response["action"]["action_number"]] + " WITH INPUT"
 
                     if response["action"].get("city_name"):
@@ -341,13 +343,14 @@ Current City: {self.user_info['current_city']}"""
 
                     output_text += ": \n" + summary
 
-                    output_response = self.send_message(output_text)
+                    output_response = self.send_message(summary)
+                    print(output_response)
 
                     return output_response["natural_response"]
             # For any other type, convert to string
             else:
                 return str(response)
-                
+
         except Exception as e:
             return f"I apologize, but I encountered an error while processing your request. Please try again. Error: {str(e)}"
 
@@ -444,12 +447,34 @@ for uni in universiteler:
 # Get list of cities that have universities
 university_cities = sorted(list(universities_by_city.keys()))
 
+def format_salary_input(value):
+    """Format salary input with dots as thousands separators"""
+    if not value:
+        return ""
+    
+    # Remove any existing dots and spaces
+    clean_value = value.replace(".", "").replace(" ", "")
+    
+    # Check if it's a valid number
+    try:
+        num = int(clean_value)
+        # Format with dots as thousands separators
+        formatted = f"{num:,}".replace(",", ".")
+        return formatted
+    except ValueError:
+        # If not a valid number, return the original value
+        return value
+
 def create_user_info_form():
     with gr.Blocks() as form:
         gr.Markdown("# User Information Form")
         with gr.Row():
             name = gr.Textbox(label="Name", placeholder="Enter your name")
-            monthly_salary = gr.Number(label="Monthly Salary (TL)", info="Enter your monthly salary")
+            monthly_salary = gr.Textbox(
+                label="Monthly Salary (TL)", 
+                placeholder="e.g., 15.000 or 100.000",
+                info="Enter your monthly salary (dots will be added automatically)"
+            )
         with gr.Row():
             family_size = gr.Number(label="Family Size", info="Number of family members")
             current_city = gr.Dropdown(
@@ -515,6 +540,7 @@ def select_agent(agent_name, message, university, history):
         formatted_message = f"I want to use the {agent_name} agent. {message if message else ''}"
         
     response = rootl_llm.root_llm_response(formatted_message, history)
+    print(response)
     history.append((message if message else f"Use {agent_name}", response))
     return history, ""
 
@@ -522,6 +548,7 @@ def submit_user_info(name, salary, family_size, current_city, target_city):
     if not all([name, salary, family_size, current_city]):
         return "Please fill out all required fields.", gr.update(visible=True), gr.update(visible=False), gr.update(visible=False), []
     
+
     context = rootl_llm.set_user_info(name, salary, family_size, current_city, target_city)
     
     # Create welcome message with user info
@@ -606,6 +633,13 @@ with gr.Blocks() as demo:
         # Right column - Chat interface
         with gr.Column(scale=2, visible=False) as chat_column:
             chat, chatbot, msg, submit = create_chat_interface()
+    
+    # Handle salary formatting
+    salary.change(
+        format_salary_input,
+        inputs=[salary],
+        outputs=[salary]
+    )
     
     # Handle form submission
     submit_btn.click(

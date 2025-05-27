@@ -8,8 +8,6 @@ import os
 from chromadb.utils import embedding_functions
 
 
-
-
 # Keep your PDF extraction function as is
 def convert_PDF_Text(pdf_path):
     reader = PdfReader(pdf_path)
@@ -249,12 +247,13 @@ from KeywordAgent import parse_university_keywords
 # print(show_results(retrieved_documents,return_only_docs=True))
 
 def rag_Response(query):
+    print("Running rag for Education agent")
     chroma_collection=get_existing_chroma_collection("UniPrices")
     university_dictionary = parse_university_keywords(query)
     university_name = university_dictionary["university_name"]
     department = university_dictionary["department"]
     rag_query = department + "Ücretleri"
     retrieved_documents = retrieveDocs(chroma_collection, rag_query, university_name, 10,return_only_docs=True)
-    print(show_results(retrieved_documents, return_only_docs=True))
+    print("Education Rag response"+show_results(retrieved_documents, return_only_docs=True))
     return show_results(retrieved_documents, return_only_docs=True)
 

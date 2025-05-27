@@ -11,8 +11,6 @@ class KeywordAgent(LLM_Agent):
         super().__init__("Keyword Agent", self.system_instructions, response_mime_type="application/json")
 
     system_instructions = """
-    System Prompt for Enhanced Keyword Extraction Agent
-
     You are KeywordBot, an advanced AI designed to analyze natural language inputs and extract 
     the most relevant keywords for API-based search operations related to cost of living 
     comparisons in Turkey. Your primary function is to intelligently route user queries and 
@@ -114,12 +112,13 @@ class KeywordAgent(LLM_Agent):
 keyword_agent=KeywordAgent()
 def parse_keywords(prompt):
     response=keyword_agent.generate_response(prompt)
+    print("Keyword agent response:"+response.text)
     return response.text
 
 def parse_university_keywords(prompt):
     parsed_keywords = parse_keywords(prompt)
     keyword_dictionary=json.loads(parsed_keywords)
-    print(keyword_dictionary["university_name"])
-    print(keyword_dictionary["department"])
+    print("University name(from Keyword Agent)"+keyword_dictionary["university_name"])
+    print("Department name(from Keyword Agent)"+keyword_dictionary["department"])
     return keyword_dictionary
 

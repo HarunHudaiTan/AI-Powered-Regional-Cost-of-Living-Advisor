@@ -207,7 +207,9 @@ class Public_Transport_Prices_Agent(LLM_Agent):
         query = ""
         city = Transportation_City_Name_Formatter.format_city_name(city)
         rag_response = public_transport_rag_Response(query, city)[0]
+        print(rag_response)
         agent = Public_Transport_Prices_Agent()
         response = agent.generate_response(rag_response)
+        print("Transportation Agent Response"+response.text)
         return response.text
 
