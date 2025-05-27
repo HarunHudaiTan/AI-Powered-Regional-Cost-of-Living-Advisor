@@ -459,7 +459,7 @@ class Fuel_Prices_Agent(LLM_Agent):
         """
         markdown = await fetch_fuel_prices(city_name)
         response = self.generate_response(markdown.raw_markdown)
-
+        print("Fuel Price Agent Response"+response.text)
         return response.text
 
 
@@ -473,7 +473,7 @@ class Fuel_Prices_Agent(LLM_Agent):
         Returns:
             str: Generated response text from the agent
         """
-        print("running generate price")
+        print("running fuel price agent")
         result = asyncio.run(self.get_fuel_prices_response(city_name))
         return result
 

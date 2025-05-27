@@ -1,3 +1,5 @@
+import logging
+
 from proj_llm_agent import LLM_Agent
 
 
@@ -172,7 +174,22 @@ for the promt:{
  "tool_type": "real_estate_analysis",
  "real_estate_executive_summary": "This report analyzes 12 real estate listings in the Keçiören district of Ankara. The average property price is 3,830,917 TL. The most expensive property is listed at 10,100,000 TL, while the least expensive is 2,150,000 TL. Estimated monthly utility costs are as follows: Water is 757 TL, Natural Gas is 1,244 TL, Electricity is 1,436 TL and Internet is 499 TL. The total monthly utility cost estimate is 3,936 TL.",
  "real_estate_detailed_analysis": "Property 1: Price 2,490,000 TL, 3+1 rooms, 140 m², Etlik Mah. Property 2: Price 2,969,000 TL, 3+1 rooms, 125 m², Çaldıran Mah. Property 3: Price 5,595,000 TL, 3+1 rooms, 165 m², Ayvalı Mah. Property 4: Price 4,249,000 TL, 3+1 rooms, 135 m², Ufuktepe Mah. Property 5: Price 3,049,000 TL, 3+1 rooms, 130 m², Karakaya Mah. Property 6: Price 10,100,000 TL, 4+1 rooms, 205 m², Yayla Mah. Property 7: Price 2,690,000 TL, 3+1 rooms, 115 m², Kalaba Mah. Property 8: Price 2,950,000 TL, 3+1 rooms, 130 m², Etlik Mah. Property 9: Price 2,150,000 TL, 2+1 rooms, 110 m², 19 Mayıs Mah. Property 10: Price 2,950,000 TL, 3+1 rooms, 125 m², Pınarbaşı Mah. Property 11: Price 3,590,000 TL, 4+1 rooms, 179 m², Uyanış Mah. Property 12: Price 2,390,000 TL, 21+1 rooms, 105 m², İncirli Mah.",
- "real_estate_financial_calculations": "Average Property Price: Total 45,971,000 TL / 12 properties = 3,830,917 TL. Utility Cost Calculation: Water 37.85 TL/m³ × 20 m³ = 757 TL monthly, Natural Gas 8.29 TL/m³ × 150 m³ = 1,244 TL monthly, Electricity 1,436 TL monthly, Internet 499 TL monthly. Total Monthly Utility Cost: 757 + 1,244 + 1,436 + 499 = 3,936 TL. Price Range: Highest 10,100,000 TL, Lowest 2,150,000 TL."
+ "real_estate_financial_calculations": "Average Property Price: Total 45,971,000 TL / 12 properties = 3,830,917 TL. Utility Cost Calculation: Water 37.85 TL/m³ × 20 m³ = 757 TL monthly, Natural Gas 8.29 TL/m³ × 150 m³ = 1,244 TL monthly, Electricity 1,436 TL monthly, Internet 499 TL monthly. Total Monthly Utility Cost: 757 + 1,244 + 1,436 + 499 = 3,936 TL. Price Range: Highest 10,100,000 TL, Lowest 2,150,000 TL.",
+  "links": [
+    "https://www.hepsiemlak.com/ankara-kecioren-etlik-satilik/daire/130404-1515",
+    "https://www.hepsiemlak.com/ankara-kecioren-caldiran-satilik/daire/138675-578",
+    "https://www.hepsiemlak.com/ankara-kecioren-ayvali-satilik/daire/113784-1566",
+    "https://www.hepsiemlak.com/ankara-kecioren-ufuktepe-satilik/daire/5116-1717",
+    "https://www.hepsiemlak.com/ankara-kecioren-karakaya-satilik/daire/85799-3199",
+    "https://www.hepsiemlak.com/ankara-kecioren-yayla-satilik/daire/156654-37",
+    "https://www.hepsiemlak.com/ankara-kecioren-kalaba-satilik/daire/156597-95",
+    "https://www.hepsiemlak.com/ankara-kecioren-etlik-satilik/daire/56586-4098",
+    "https://www.hepsiemlak.com/ankara-kecioren-19-mayis-satilik/daire/14431-11064",
+    "https://www.hepsiemlak.com/ankara-kecioren-pinarbasi-satilik/daire/125422-282",
+    "https://www.hepsiemlak.com/ankara-kecioren-uyanis-satilik/daire/138675-676",
+    "https://www.hepsiemlak.com/ankara-kecioren-incirli-satilik/daire/113784-1568"
+  ]
+
 }
 
 },
@@ -518,8 +535,6 @@ Your response must be:
 
     def set_system_instructions(self,sys_instructions):
        self.role = f"{sys_instructions}"
-
-
 
 
     def generate_summary_agent_response(self,prompt,tool_number):
