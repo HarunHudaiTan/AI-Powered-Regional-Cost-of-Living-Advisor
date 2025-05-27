@@ -221,7 +221,6 @@ Note: Ensure all 10+ JSON objects are correctly formatted. If there aren't enoug
             collection_name = "MyDocuments"
             logger.info(f"Initializing Real_Estate_RAG with model: {sentence_transformer_model}")
 
-            embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=sentence_transformer_model)
             chroma_collection = self.get_existing_chroma_collection(collection_name)
 
             # Show database information

@@ -1,13 +1,11 @@
 from CreateChat import CreateChat
-from AgentOrchestrator import orchestrator_response
-import json
+
 from AgentOrchestrator import orchestrator_response
 
 class RootLLM(CreateChat):
     def __init__(self):
         super().__init__(name="ROOT AGENT", role=self.system_instructions, response_mime_type="application/json")
         self.user_info = None
-
     system_instructions="""
 # Turkish Regional Cost of Living Advisor System Prompt
 
@@ -180,7 +178,7 @@ The `user_intent_turkish` field should be concise and direct:
 - **Grocery**: "Market fiyatları", "Gıda maliyetleri"
 - **Education**: "Boğaziçi Üniversitesi ücretleri", "Eğitim maliyetleri"
 - **Transport**: "Ankara ulaşım maliyetleri", "Benzin fiyatları"
-- **General**: "Genel yaşam maliyeti bilgisi", "Yardım talebi"
+- **General**: "Genel yaşam maliyeti bilgisi"
 
 ## Language-Specific Examples
 
@@ -268,11 +266,13 @@ Continue the chat according to the language used by the customer.
 6. **Tool Output Processing**: After receiving a STOP command and tool results, generate a natural, helpful response based on the data
 7. **Turkish Intent**: Always include a concise Turkish phrase in `user_intent_turkish` that directly describes what the user wants
 8. **STOP Condition**: The next prompt after the stop condition will be the context of the context provided by the prompt and you must answer only by the given context
-9. **No Guidence**: If the user asks you for data you cant fetch, then politely say you cant do it and tell the user what you can do.
-10.**RE-USE TOOL OUTPUTS IF AVAILABLE**: Always reuse the outputs given to you if the user give a followup query about the same topic. The tool outputs will be given to you in the format "TOOL OUTPUT FROM x WITH INPUT y : output" Use CONTINUE code if youre doing so.
-
+9.After the stop condition if the context is about
+10. **No Guidence**: If the user asks you for data you cant fetch, then politely say you cant do it and tell the user what you can do.
+11.**RE-USE TOOL OUTPUTS IF AVAILABLE**: Always reuse the outputs given to you if the user give a followup query about the same topic. The tool outputs will be given to you in the format "TOOL OUTPUT FROM x WITH INPUT y : output" Use CONTINUE code if youre doing so.
+12.After reviewing the context for real estate always write links after the information
 ## Best Practices
 - Always match the user's language preference
+- When users says hi call user by his name. 
 - Use the user's original phrasing in city_name when possible
 - Be conversational and helpful rather than robotic
 - Guide users naturally toward the information they need
@@ -298,58 +298,58 @@ Continue the chat according to the language used by the customer.
     def root_llm_response(self, message, history):
         if not self.user_info:
             return "Please fill out the user information form first."
-            
-        try:
-            # Create a more detailed context with user information
-            context = f"""User Information:
-Name: {self.user_info['name']}
-Monthly Salary: {self.user_info['monthly_salary']} TL
-Family Size: {self.user_info['family_size']} persons
-Current City: {self.user_info['current_city']}"""
 
-            if self.user_info['target_city']:
-                context += f"\nTarget City: {self.user_info['target_city']}"
+        # Create a more detailed context with user information
+        context = f"""User Information:
+        Name: {self.user_info['name']}
+        Monthly Salary: {self.user_info['monthly_salary']} TL
+        Family Size: {self.user_info['family_size']} persons
+        Current City: {self.user_info['current_city']}"""
 
-            context += f"\n\nPrevious conversation history:\n"
-            for user_msg, bot_msg in history:
-                context += f"User: {user_msg}\nAssistant: {bot_msg}\n"
+        if self.user_info['target_city']:
+            context += f"\nTarget City: {self.user_info['target_city']}"
 
-            context += f"\nCurrent user message: {message}"
+        context += f"\n\nPrevious conversation history:\n"
+        for user_msg, bot_msg in history:
+            context += f"User: {user_msg}\nAssistant: {bot_msg}\n"
 
-            response = self.send_message(context)
+        context += f"\nCurrent user message: {message}"
 
-            tools = {1:"Real Estate",
-                     2:"Market Price",
-                     3:"Education Price",
-                     4:"Fuel Price",
-                     5:"Transportation"}
+        response = self.send_message(context)
 
-            # If response is already a dictionary
-            if isinstance(response, dict):
-                if "natural_response" in response and response.get("response_continue") == "CONTINUE":
-                    return response["natural_response"]
-                elif "natural_response" in response and response.get("response_continue") == "STOP":
-                    summary=orchestrator_response(response)
+        tools = {1:"Real Estate",
+                 2:"Market Price",
+                 3:"Education Price",
+                 4:"Fuel Price",
+                 5:"Transportation"}
 
-                    output_text = "TOOL OUTPUT FROM " + tools[response["action"]["action_number"]] + " WITH INPUT"
+        # If response is already a dictionary
+        if isinstance(response, dict):
+            if "natural_response" in response and response.get("response_continue") == "CONTINUE":
+                print(response)
+                return response["natural_response"]
 
-                    if response["action"].get("city_name"):
-                        output_text += " " + response["action"]["city_name"]
+            elif "natural_response" in response and response.get("response_continue") == "STOP":
+                summary=orchestrator_response(response)
+                print("Summary agent response"+summary)
+                output_text = "TOOL OUTPUT FROM " + tools[response["action"]["action_number"]] + " WITH INPUT"
 
-                    if response.get("user_intent_turkish"):
-                        output_text += " " + response["user_intent_turkish"]
+                if response["action"].get("city_name"):
+                    output_text += " " + response["action"]["city_name"]
 
-                    output_text += ": \n" + summary
+                if response.get("user_intent_turkish"):
+                    output_text += " " + response["user_intent_turkish"]
 
-                    output_response = self.send_message(output_text)
+                output_text += ": \n" + summary
 
-                    return output_response["natural_response"]
-            # For any other type, convert to string
-            else:
-                return str(response)
-                
-        except Exception as e:
-            return f"I apologize, but I encountered an error while processing your request. Please try again. Error: {str(e)}"
+                output_response = self.send_message(summary)
+                print(output_response)
+
+                return output_response["natural_response"]
+        # For any other type, convert to string
+        else:
+            return str(response)
+
 
 rootl_llm = RootLLM()
 
@@ -433,13 +433,45 @@ universiteler = [
     "Ankara - Yüksek İhtisas Üniversitesi"
 ]
 
+# Create a dictionary of universities by city
+universities_by_city = {}
+for uni in universiteler:
+    city, university = uni.split(" - ")
+    if city not in universities_by_city:
+        universities_by_city[city] = []
+    universities_by_city[city].append(uni)
+
+# Get list of cities that have universities
+university_cities = sorted(list(universities_by_city.keys()))
+
+def format_salary_input(value):
+    """Format salary input with dots as thousands separators"""
+    if not value:
+        return ""
+    
+    # Remove any existing dots and spaces
+    clean_value = value.replace(".", "").replace(" ", "")
+    
+    # Check if it's a valid number
+    try:
+        num = int(clean_value)
+        # Format with dots as thousands separators
+        formatted = f"{num:,}".replace(",", ".")
+        return formatted
+    except ValueError:
+        # If not a valid number, return the original value
+        return value
 
 def create_user_info_form():
     with gr.Blocks() as form:
         gr.Markdown("# User Information Form")
         with gr.Row():
             name = gr.Textbox(label="Name", placeholder="Enter your name")
-            monthly_salary = gr.Number(label="Monthly Salary (TL)", info="Enter your monthly salary")
+            monthly_salary = gr.Textbox(
+                label="Monthly Salary (TL)", 
+                placeholder="e.g., 15.000 or 100.000",
+                info="Enter your monthly salary (dots will be added automatically)"
+            )
         with gr.Row():
             family_size = gr.Number(label="Family Size", info="Number of family members")
             current_city = gr.Dropdown(
@@ -460,10 +492,23 @@ def create_user_info_form():
 
 def create_chat_interface():
     with gr.Blocks() as chat:
-        chatbot = gr.Chatbot()
-        msg = gr.Textbox(label="Message", placeholder="Type your message here...")
-        clear = gr.Button("Clear")
-        return chat, chatbot, msg, clear
+        chatbot = gr.Chatbot(
+            elem_id="chatbot",
+            height=600,
+            show_copy_button=True,
+            bubble_full_width=False,
+            show_label=False,
+        )
+        with gr.Row():
+            msg = gr.Textbox(
+                label="Message",
+                placeholder="Type your message and press Enter or click Send...",
+                show_label=False,
+                container=False,
+                scale=9,
+            )
+            submit = gr.Button("Send", variant="primary", scale=1)
+        return chat, chatbot, msg, submit
 
 def show_agent_selector():
     return gr.update(visible=True)
@@ -472,7 +517,14 @@ def hide_agent_selector():
     return gr.update(visible=False)
 
 def show_university_dropdown(agent_name):
-    return gr.update(visible=agent_name == "Education Pricing Agent")
+    if agent_name == "Education Pricing Agent":
+        return gr.update(visible=True), gr.update(visible=False)
+    return gr.update(visible=False), gr.update(visible=False)
+
+def update_university_list(city):
+    if city:
+        return gr.update(choices=universities_by_city[city], visible=True)
+    return gr.update(choices=[], visible=False)
 
 def select_agent(agent_name, message, university, history):
     if not agent_name:
@@ -485,26 +537,51 @@ def select_agent(agent_name, message, university, history):
         formatted_message = f"I want to use the {agent_name} agent. {message if message else ''}"
         
     response = rootl_llm.root_llm_response(formatted_message, history)
+    print(response)
     history.append((message if message else f"Use {agent_name}", response))
     return history, ""
 
 def submit_user_info(name, salary, family_size, current_city, target_city):
     if not all([name, salary, family_size, current_city]):
-        return "Please fill out all required fields.", gr.update(visible=True), gr.update(visible=False), gr.update(visible=False)
+        return "Please fill out all required fields.", gr.update(visible=True), gr.update(visible=False), gr.update(visible=False), []
     
+
     context = rootl_llm.set_user_info(name, salary, family_size, current_city, target_city)
-    return "User information submitted successfully! You can now start chatting.", gr.update(visible=False), gr.update(visible=True), gr.update(visible=True)
+    
+    # Create welcome message with user info
+    welcome_message = f"""👋 Merhaba {name}! I'm your Turkish Regional Cost of Living Advisor.
+
+I understand you're currently living in {current_city} with a monthly salary of {salary} TL and a family size of {family_size} people."""
+
+    if target_city:
+        welcome_message += f"\n\nI see you're interested in {target_city}. That's a great choice!"
+    
+    welcome_message += """
+
+I can help you with detailed information about:
+• 🏠 Real Estate prices and rental costs
+• 🛒 Grocery and market prices
+• 🎓 Education costs and university fees
+• ⛽ Fuel prices
+• 🚌 Public transportation costs
+
+What would you like to know more about?"""
+
+    # Initialize chat history with welcome message
+    chat_history = [("", welcome_message)]
+    
+    return "User information submitted successfully!", gr.update(visible=False), gr.update(visible=True), gr.update(visible=True), chat_history
 
 def chat_response(message, history):
     if not message:
-        return history
+        return history, ""
     
     # Get response from LLM
     response = rootl_llm.root_llm_response(message, history)
     
     # Append the new message and response to history
     history.append((message, response))
-    return history
+    return history, ""
 
 with gr.Blocks() as demo:
     gr.Markdown("# Turkish Regional Cost of Living Advisor")
@@ -531,8 +608,14 @@ with gr.Blocks() as demo:
                     label="Agent",
                     info="Select the agent you want to use"
                 )
+                university_city_dropdown = gr.Dropdown(
+                    choices=university_cities,
+                    label="Select City",
+                    info="Select a city to see its universities",
+                    visible=False
+                )
                 university_dropdown = gr.Dropdown(
-                    choices=universiteler,
+                    choices=[],
                     label="Select University",
                     info="Select a university for education pricing",
                     visible=False
@@ -546,30 +629,45 @@ with gr.Blocks() as demo:
         
         # Right column - Chat interface
         with gr.Column(scale=2, visible=False) as chat_column:
-            chat, chatbot, msg, clear = create_chat_interface()
+            chat, chatbot, msg, submit = create_chat_interface()
+    
+    # Handle salary formatting
+    salary.change(
+        format_salary_input,
+        inputs=[salary],
+        outputs=[salary]
+    )
     
     # Handle form submission
     submit_btn.click(
         submit_user_info,
         inputs=[name, salary, family_size, current_city, target_city],
-        outputs=[status, form_section, agent_section, chat_column]
+        outputs=[status, form_section, agent_section, chat_column, chatbot]
     )
     
     # Handle chat
     msg.submit(
         chat_response,
         inputs=[msg, chatbot],
-        outputs=[chatbot]
-    ).then(
-        lambda: "",
-        None,
-        [msg]
+        outputs=[chatbot, msg]
+    )
+    
+    submit.click(
+        chat_response,
+        inputs=[msg, chatbot],
+        outputs=[chatbot, msg]
     )
     
     # Handle agent selection
     agent_dropdown.change(
         show_university_dropdown,
         inputs=[agent_dropdown],
+        outputs=[university_city_dropdown, university_dropdown]
+    )
+    
+    university_city_dropdown.change(
+        update_university_list,
+        inputs=[university_city_dropdown],
         outputs=[university_dropdown]
     )
     
@@ -578,8 +676,6 @@ with gr.Blocks() as demo:
         inputs=[agent_dropdown, agent_message, university_dropdown, chatbot],
         outputs=[chatbot, agent_message]
     )
-    
-    clear.click(lambda: None, None, chatbot, queue=False)
 
 demo.launch()
 

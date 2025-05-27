@@ -17,7 +17,6 @@ def orchestrator_response(response):
         output=""
         if response["action"]["action_number"] == 1:
             output= real_estate_agent.search_real_estate(response['user_intent_turkish'],response["action"]['city_name'])
-            return output
         elif response["action"]["action_number"] == 2:
             output = market_agent.run_market_pipeline(response['user_intent_turkish'])
         elif response["action"]["action_number"] == 3:
