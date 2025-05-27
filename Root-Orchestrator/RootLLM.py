@@ -86,22 +86,28 @@ Example:User:I want to move into fenerbahce You:Fenerbahçe is not a province na
 ### When to Use Action Numbers 1-4 with STOP:
 Only use these when the user has EXPLICITLY requested specific information:
 
-**Tool 1 (Real Estate)**: User specifically asks about housing, rent, property prices, real estate
+**Tool 1 (Real Estate)**: User specifically asks about housing, rent, property prices, real estate. You only need a province name but you can also accept district . Use this when its clear the user wants to move to somewhere.
 - Example: "What are rent prices in Istanbul?"
 - Example: "I need housing costs for Ankara"
+- Example: "İzmir Karşıyakada hangi evler var?"
 
-**Tool 2 (Grocery Pricing)**: User specifically asks about food prices, grocery costs, market prices
+**Tool 2 (Grocery Pricing)**: User specifically asks about food prices, grocery costs, market prices. Use this when you notice the user wants to see what they can buy with their grocery money.
 - Example: "What do groceries cost?"
 - Example: "I need food price information"
+- Example: "Benim market için harcayacağım 1000 lira var"
 
-**Tool 3 (Education)**: User specifically mentions a university name or education costs
+**Tool 3 (Education)**: User specifically mentions a university name or education costs. Use this when you see talks about universities.
 - Example: "What are the costs for Ankara University?"
 - Example: "Tell me about Bogazici University fees"
+- Example: "TED Üniversitesinceki mühendislik bölüm fiyatları ney?"
 
-**Tool 4 (Fuel Price)**: User specifically asks about gas prices
+**Tool 4 (Fuel Price)**: User specifically asks about gas prices You only need a province name here. Use this when you see mentions of private cars.
 - Example: "What are gas prices in Antalya?"
-**Tool 5 (Public Transport Prices)**: User specifically asks about public transportation prices
+- Example: "Edineye arabamla gideceğim. Yakıt fiyatları nasıl orada?"
+
+**Tool 5 (Public Transport Prices)**: User specifically asks about public transportation prices. Use this when you see mentions of public transportation methods.
 - Example: "What are public transportation prices in Antalya?"
+- Example: "Ankarada otobüs fiyatları nasıl?"
 
 ## Tool Usage Examples
 
@@ -240,6 +246,18 @@ The `user_intent_turkish` field should be concise and direct:
 }
 ```
 
+**Note:**
+Continue the chat according to the language used by the customer.
+**Example:**
+**You:**  "Is there anything else I can help you with today?"
+**Customer:** "Ankarada ev bulmaya çalışıyorum" //Turkish
+**You:** "Tamamdır sizin için ev fiyatlarına bakıyorum." //continue with Turkish
+
+**Example:**
+**You:**  "Size nasıl yardımcı olabilirim?"
+**Customer:** "Im looking for houses in Ankara" //English
+**You:** "Alright. Ill look for houses in Ankara for you." //continue with English
+
 ## Operational Rules
 
 1. **Default to Action 0**: When in doubt, always use action_number 0 with "CONTINUE"
@@ -249,7 +267,10 @@ The `user_intent_turkish` field should be concise and direct:
 5. **Information Categories**: When users don't specify needs, inform them you can provide information about: Real Estate, Education, Market Prices, and Transportation
 6. **Tool Output Processing**: After receiving a STOP command and tool results, generate a natural, helpful response based on the data
 7. **Turkish Intent**: Always include a concise Turkish phrase in `user_intent_turkish` that directly describes what the user wants
-8.The next prompt after the stop condition will be the context of the context provided by the prompt and you must answer only by the given context
+8. **STOP Condition**: The next prompt after the stop condition will be the context of the context provided by the prompt and you must answer only by the given context
+9. **No Guidence**: If the user asks you for data you cant fetch, then politely say you cant do it and tell the user what you can do.
+10.**RE-USE TOOL OUTPUTS IF AVAILABLE**: Always reuse the outputs given to you if the user give a followup query about the same topic. The tool outputs will be given to you in the format "TOOL OUTPUT FROM x WITH INPUT y : output" Use CONTINUE code if youre doing so.
+
 ## Best Practices
 - Always match the user's language preference
 - Use the user's original phrasing in city_name when possible
@@ -297,14 +318,32 @@ Current City: {self.user_info['current_city']}"""
 
             response = self.send_message(context)
 
+            tools = {1:"Real Estate",
+                     2:"Market Price",
+                     3:"Education Price",
+                     4:"Fuel Price",
+                     5:"Transportation"}
+
             # If response is already a dictionary
             if isinstance(response, dict):
                 if "natural_response" in response and response.get("response_continue") == "CONTINUE":
                     return response["natural_response"]
                 elif "natural_response" in response and response.get("response_continue") == "STOP":
                     summary=orchestrator_response(response)
-                    response = self.send_message(summary)
-                    return response["natural_response"]
+
+                    output_text = "TOOL OUTPUT FROM " + tools[response["action"]["action_number"]] + " WITH INPUT"
+
+                    if response["action"].get("city_name"):
+                        output_text += " " + response["action"]["city_name"]
+
+                    if response.get("user_intent_turkish"):
+                        output_text += " " + response["user_intent_turkish"]
+
+                    output_text += ": \n" + summary
+
+                    output_response = self.send_message(output_text)
+
+                    return output_response["natural_response"]
             # For any other type, convert to string
             else:
                 return str(response)

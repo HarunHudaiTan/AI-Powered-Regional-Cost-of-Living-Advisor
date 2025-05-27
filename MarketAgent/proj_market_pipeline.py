@@ -1,4 +1,4 @@
-from proj_llm_agent import LLM_Agent
+from proj_llm_agent import LLM_Agent_Alt
 from google import genai
 from google.genai import types
 from proj_search_func import search
@@ -34,7 +34,7 @@ class LLM_Market_Pipeline():
                 ),
             },
         )
-        self.market_parser = LLM_Agent(
+        self.market_parser = LLM_Agent_Alt(
             name = "Market Parser",
             role = 
             """You are a parse helper agent that is tasked to retrieve a products name its cost and the store page link it has.
@@ -63,7 +63,7 @@ class LLM_Market_Pipeline():
                 ),
             },
         )
-        self.market_keyword_generator = LLM_Agent(
+        self.market_keyword_generator = LLM_Agent_Alt(
             name = "Market Keyword Generator",
             role = 
             """You are an agent that focuses on generating turkish keywords to search for grocery market items with.
@@ -112,7 +112,7 @@ class LLM_Market_Pipeline():
                 ),
             },
         )
-        self.market_product_parser = LLM_Agent(
+        self.market_product_parser = LLM_Agent_Alt(
             name = "Market Keyword Generator",
             role = 
             """You are a parsing agent thats focused on retrieving a products name price and what stores its available on. 
@@ -138,7 +138,7 @@ class LLM_Market_Pipeline():
                 ),
             },
         )
-        self.market_searcher = LLM_Agent(
+        self.market_searcher = LLM_Agent_Alt(
             name = "Market Searcher",
             role = 
             """
