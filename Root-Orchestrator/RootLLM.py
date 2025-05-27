@@ -6,6 +6,7 @@ from AgentOrchestrator import orchestrator_response
 class RootLLM(CreateChat):
     def __init__(self):
         super().__init__(name="ROOT AGENT", role=self.system_instructions, response_mime_type="application/json")
+        self.user_info = None
 
     system_instructions="""
 # Turkish Regional Cost of Living Advisor System Prompt
@@ -280,10 +281,42 @@ Continue the chat according to the language used by the customer.
 - Only execute tools when the user has made a clear, specific request for that type of information
 """
 
+    def set_user_info(self, name, monthly_salary, family_size, current_city, target_city=None):
+        self.user_info = {
+            "name": name,
+            "monthly_salary": monthly_salary,
+            "family_size": family_size,
+            "current_city": current_city,
+            "target_city": target_city
+        }
+        # Create initial context message
+        context = f"User Information:\nName: {name}\nMonthly Salary: {monthly_salary}\nFamily Size: {family_size}\nCurrent City: {current_city}"
+        if target_city:
+            context += f"\nTarget City: {target_city}"
+        return context
 
     def root_llm_response(self, message, history):
+        if not self.user_info:
+            return "Please fill out the user information form first."
+            
         try:
-            response = self.send_message(message)
+            # Create a more detailed context with user information
+            context = f"""User Information:
+Name: {self.user_info['name']}
+Monthly Salary: {self.user_info['monthly_salary']} TL
+Family Size: {self.user_info['family_size']} persons
+Current City: {self.user_info['current_city']}"""
+
+            if self.user_info['target_city']:
+                context += f"\nTarget City: {self.user_info['target_city']}"
+
+            context += f"\n\nPrevious conversation history:\n"
+            for user_msg, bot_msg in history:
+                context += f"User: {user_msg}\nAssistant: {bot_msg}\n"
+
+            context += f"\nCurrent user message: {message}"
+
+            response = self.send_message(context)
 
             tools = {1:"Real Estate",
                      2:"Market Price",
@@ -316,18 +349,238 @@ Continue the chat according to the language used by the customer.
                 return str(response)
                 
         except Exception as e:
-            # Return a user-friendly error message instead of crashing
-            #raise(e)
             return f"I apologize, but I encountered an error while processing your request. Please try again. Error: {str(e)}"
 
 rootl_llm = RootLLM()
+
 import gradio as gr
-demo = gr.ChatInterface(
-    fn=rootl_llm.root_llm_response,
-    type="messages",
-    title="Large Language Model Demo",
-    description="Enter a sentence or paragraph to generate a response",
-)
+
+# List of all 81 provinces of Turkey
+TURKISH_PROVINCES = [
+    "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin", "Aydın", "Balıkesir",
+    "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale", "Çankırı", "Çorum", "Denizli",
+    "Diyarbakır", "Edirne", "Elazığ", "Erzincan", "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari",
+    "Hatay", "Isparta", "Mersin", "İstanbul", "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir",
+    "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", "Muş", "Nevşehir",
+    "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas", "Tekirdağ", "Tokat",
+    "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak", "Aksaray", "Bayburt", "Karaman",
+    "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan", "Iğdır", "Yalova", "Karabük", "Kilis", "Osmaniye", "Düzce"
+]
+
+# List of universities
+universiteler = [
+    "Alanya - Alanya HEP Üniversitesi",
+    "Ankara - Ankara Bilim Üniversitesi",
+    "Ankara - Ankara Medipol Üniversitesi",
+    "Antalya - Antalya Belek Üniversitesi",
+    "Ankara - Atılım Üniversitesi",
+    "Trabzon - Avrasya Üniversitesi",
+    "İstanbul - Bahçeşehir Üniversitesi",
+    "Ankara - Başkent Üniversitesi",
+    "İstanbul - Beykent Üniversitesi",
+    "İstanbul - Beykoz Üniversitesi",
+    "İstanbul - Bezm-i Âlem Vakıf Üniversitesi",
+    "Ankara - Bilkent Üniversitesi",
+    "İstanbul - Biruni Üniversitesi",
+    "Mersin - Çağ Üniversitesi",
+    "Ankara - Çankaya Üniversitesi",
+    "Ankara - Demircioglu Bilim Üniversitesi",
+    "İstanbul - Doğuş Üniversitesi",
+    "İstanbul - Fatih Sultan Mehmet Üniversitesi",
+    "İstanbul - Fenerbahçe Üniversitesi",
+    "İstanbul - Haliç Üniversitesi",
+    "Gaziantep - Hasan Kalyoncu Üniversitesi",
+    "İstanbul - İbn Haldun Üniversitesi",
+    "İstanbul - İstanbul 29 Mayıs Üniversitesi",
+    "İstanbul - İstanbul Atlas Üniversitesi",
+    "İstanbul - İstanbul Aydın Üniversitesi",
+    "İstanbul - İstanbul Bilgi Üniversitesi",
+    "İstanbul - İstanbul Esenyurt Üniversitesi",
+    "İstanbul - İstanbul Galata Üniversitesi",
+    "İstanbul - İstanbul Gedik Üniversitesi",
+    "İstanbul - İstanbul Kent Üniversitesi",
+    "İstanbul - İstanbul Kültür Üniversitesi",
+    "İstanbul - İstanbul Nişantaşı Üniversitesi",
+    "İstanbul - İstanbul Rumeli Üniversitesi",
+    "İstanbul - İstanbul Sabahattin Zaim Üniversitesi",
+    "İstanbul - İstanbul Sağlık ve Sosyal Bilimler Meslek Yüksekokulu",
+    "İstanbul - İstanbul Sağlık ve Teknoloji Üniversitesi",
+    "İstanbul - İstanbul Şişli Meslek Yüksekokulu",
+    "İstanbul - İstanbul Ticaret Üniversitesi",
+    "İstanbul - İstanbul Yeni Yüzyıl Üniversitesi",
+    "İstanbul - İstinye Üniversitesi",
+    "İzmir - İzmir Ekonomi Üniversitesi",
+    "İstanbul - Kadir Has Üniversitesi",
+    "Nevşehir - Kapadokya Üniversitesi",
+    "İstanbul - Koç Üniversitesi",
+    "Kocaeli - Kocaeli Sağlık ve Teknoloji Üniversitesi",
+    "Konya - Konya Gıda ve Tarım Üniversitesi",
+    "Ankara - Lokman Hekim Üniversitesi",
+    "İstanbul - Maltepe Üniversitesi",
+    "Bursa - Mudanya Üniversitesi",
+    "Kayseri - Nuh Naci Yazgan Üniversitesi",
+    "Ankara - Ostim Teknik Üniversitesi",
+    "İstanbul - Özyeğin Üniversitesi",
+    "İstanbul - Piri Reis Üniversitesi",
+    "İstanbul - Sabancı Üniversitesi",
+    "Gaziantep - Sanko Üniversitesi",
+    "Ankara - TED Üniversitesi",
+    "Ankara - TOBB Ekonomi ve Teknoloji Üniversitesi",
+    "Mersin - Toros Üniversitesi",
+    "Ankara - Türk Hava Kurumu Üniversitesi",
+    "İstanbul - Üsküdar Üniversitesi",
+    "İzmir - Yaşar Üniversitesi",
+    "Ankara - Yüksek İhtisas Üniversitesi"
+]
+
+
+def create_user_info_form():
+    with gr.Blocks() as form:
+        gr.Markdown("# User Information Form")
+        with gr.Row():
+            name = gr.Textbox(label="Name", placeholder="Enter your name")
+            monthly_salary = gr.Number(label="Monthly Salary (TL)", info="Enter your monthly salary")
+        with gr.Row():
+            family_size = gr.Number(label="Family Size", info="Number of family members")
+            current_city = gr.Dropdown(
+                choices=TURKISH_PROVINCES,
+                label="Current City",
+                info="Select your current city",
+                allow_custom_value=False
+            )
+        target_city = gr.Dropdown(
+            choices=TURKISH_PROVINCES,
+            label="Target City (Optional)",
+            info="Select the city you want to move to",
+            allow_custom_value=False
+        )
+        submit_btn = gr.Button("Submit")
+        status = gr.Markdown("Please fill out all required fields to start chatting.")
+        return form, name, monthly_salary, family_size, current_city, target_city, submit_btn, status
+
+def create_chat_interface():
+    with gr.Blocks() as chat:
+        chatbot = gr.Chatbot()
+        msg = gr.Textbox(label="Message", placeholder="Type your message here...")
+        clear = gr.Button("Clear")
+        return chat, chatbot, msg, clear
+
+def show_agent_selector():
+    return gr.update(visible=True)
+
+def hide_agent_selector():
+    return gr.update(visible=False)
+
+def show_university_dropdown(agent_name):
+    return gr.update(visible=agent_name == "Education Pricing Agent")
+
+def select_agent(agent_name, message, university, history):
+    if not agent_name:
+        return history, ""
+    
+    # Format the message to explicitly request the selected agent
+    if agent_name == "Education Pricing Agent" and university:
+        formatted_message = f"I want to use the {agent_name} agent for {university}. {message if message else ''}"
+    else:
+        formatted_message = f"I want to use the {agent_name} agent. {message if message else ''}"
+        
+    response = rootl_llm.root_llm_response(formatted_message, history)
+    history.append((message if message else f"Use {agent_name}", response))
+    return history, ""
+
+def submit_user_info(name, salary, family_size, current_city, target_city):
+    if not all([name, salary, family_size, current_city]):
+        return "Please fill out all required fields.", gr.update(visible=True), gr.update(visible=False), gr.update(visible=False)
+    
+    context = rootl_llm.set_user_info(name, salary, family_size, current_city, target_city)
+    return "User information submitted successfully! You can now start chatting.", gr.update(visible=False), gr.update(visible=True), gr.update(visible=True)
+
+def chat_response(message, history):
+    if not message:
+        return history
+    
+    # Get response from LLM
+    response = rootl_llm.root_llm_response(message, history)
+    
+    # Append the new message and response to history
+    history.append((message, response))
+    return history
+
+with gr.Blocks() as demo:
+    gr.Markdown("# Turkish Regional Cost of Living Advisor")
+    
+    with gr.Row():
+        # Left column - User info form and Agent selection
+        with gr.Column(scale=1) as left_column:
+            # User info form section
+            with gr.Column(visible=True) as form_section:
+                form, name, salary, family_size, current_city, target_city, submit_btn, status = create_user_info_form()
+            
+            # Agent section
+            with gr.Column(visible=False) as agent_section:
+                # Agent selector
+                gr.Markdown("### Select an Agent")
+                agent_dropdown = gr.Dropdown(
+                    choices=[
+                        "Real Estate Agent",
+                        "Grocery Pricing Agent",
+                        "Education Pricing Agent",
+                        "Fuel Price Agent",
+                        "Public Transportation Agent"
+                    ],
+                    label="Agent",
+                    info="Select the agent you want to use"
+                )
+                university_dropdown = gr.Dropdown(
+                    choices=universiteler,
+                    label="Select University",
+                    info="Select a university for education pricing",
+                    visible=False
+                )
+                agent_message = gr.Textbox(
+                    label="Additional Message (Optional)",
+                    placeholder="Add any specific details for the agent...",
+                    info="Leave empty to use the agent with current chat context"
+                )
+                use_agent_btn = gr.Button("Use Selected Agent")
+        
+        # Right column - Chat interface
+        with gr.Column(scale=2, visible=False) as chat_column:
+            chat, chatbot, msg, clear = create_chat_interface()
+    
+    # Handle form submission
+    submit_btn.click(
+        submit_user_info,
+        inputs=[name, salary, family_size, current_city, target_city],
+        outputs=[status, form_section, agent_section, chat_column]
+    )
+    
+    # Handle chat
+    msg.submit(
+        chat_response,
+        inputs=[msg, chatbot],
+        outputs=[chatbot]
+    ).then(
+        lambda: "",
+        None,
+        [msg]
+    )
+    
+    # Handle agent selection
+    agent_dropdown.change(
+        show_university_dropdown,
+        inputs=[agent_dropdown],
+        outputs=[university_dropdown]
+    )
+    
+    use_agent_btn.click(
+        select_agent,
+        inputs=[agent_dropdown, agent_message, university_dropdown, chatbot],
+        outputs=[chatbot, agent_message]
+    )
+    
+    clear.click(lambda: None, None, chatbot, queue=False)
+
 demo.launch()
 
 
