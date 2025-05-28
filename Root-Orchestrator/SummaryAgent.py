@@ -282,7 +282,7 @@ You will receive Single JSON object containing:
 - Highlight additional fees (like VAT) and special conditions
 - Calculate total costs including taxes where applicable
 IMPORTANT RULES:
-Do not provide response to topics other than education prices For example if a JSON is provided about a different topic you just return null to all of the fields
+1. Do not provide response to topics other than education prices For example if a JSON is provided about a different topic you just return null to all of the fields
 For the Prompt:
 {
 "university": "TED Üniversitesi",
@@ -300,6 +300,35 @@ Akademik başarı, sosyal aktiviteler ve maddi durum kriterlerine göre burs imk
  "detailed_analysis": "Üniversite: TED Üniversitesi, Fakülte: Mühendislik Fakültesi, Tam Ücret: 600,000 TL. İndirimli Ücretler: %50 Burs ile 300,000 TL, %25 Burs ile 450,000 TL. Ek Bilgiler: Mühendislik programlarında %50 veya %25 burs imkanı bulunmaktadır. Eğitim ücretleri peşin veya taksit seçenekleri ile ödenebilir. Taksit seçenekleri: %4 vade farkı ile 4 taksit, %15 vade farkı ile 11 taksit. Akademik başarı, sosyal aktiviteler ve maddi durum kriterlerine göre burs imkanları mevcuttur.",
  "financial_calculations": "Tam Eğitim Ücreti: 600,000 TL. %50 Burs ile Eğitim Ücreti: 300,000 TL (Burs Miktarı: 300,000 TL). %25 Burs ile Eğitim Ücreti: 450,000 TL (Burs Miktarı: 150,000 TL). Taksitli Ödeme Seçenekleri: 4 Taksit (%4 Vade Farkı) - %50 Burs ile toplam 312,000 TL, aylık 78,000 TL; %25 Burs ile toplam 468,000 TL, aylık 117,000 TL. 11 Taksit (%15 Vade Farkı) - %50 Burs ile toplam 345,000 TL, aylık 31,364 TL; %25 Burs ile toplam 517,500 TL, aylık 47,045 TL."
  }   
+ 2. If any university other than these universities provided to you return null to all of your response fields.     
+ 
+ 
+ University Database:
+       alanyaHepUniversitesi, ankaraBilimUniversitesi, ankaraMedipolUniversitesi, 
+       antalyaBelekUniversitesi, atilimUniversitesi, avrasyaUniversitesi, 
+       bahcesehirUniversitesi, baskentUniversitesi, beykentUniversitesi, 
+       beykozUniversitesi, bezmIAlemVakifUniversitesi, bilkentUniversitesi, 
+       biruniUniversitesi, cagUniversitesi, cankayaUniversitesi, 
+       demirciogluBilimUniversitesi, dogusUniversitesi, fatihSultanMehmetUniversitesi, 
+       fenerbahceUniversitesi, halicUniversitesi, hasanKalyoncuUniversitesi, 
+       ibnHaldunUniversitesi, istanbul29MayisUniversitesi, istanbulAtlasUniversitesi, 
+       istanbulAydinUniversitesi, istanbulBilgiUniversitesi, istanbulEsenyurtUniversitesi, 
+       istanbulGalataUniversitesi, istanbulGedikUniversitesi, istanbulKentUniversitesi, 
+       istanbulKulturUniversitesi, istanbulNisantasiUniversitesi, istanbulRumeliUniversitesi, 
+       istanbulSabahattinZaimUniversitesi, istanbulSaglikVeSosyalBilimlerMeslekYuksekokulu, 
+       istanbulSaglikVeTeknolojiUniversitesi, istanbulSisliMeslekYuksekokulu, 
+       istanbulTicaretUniversitesi, istanbulYeniYuzyilUniversitesi, istinyeUniversitesi, 
+       izmirEkonomi, kadirHasUniversitesi, kapadokyaUniversitesi, kocUniversitesi, 
+       kocaeliSaglikVeTeknolojiUniversitesi, konyaGidaVeTarimUniversitesi, 
+       lokmanHekimUniversitesi, maltepeUniversitesi, mudanyaUniversitesi, 
+       nuhNaciYazganUniversitesi, ostimTeknikUniversitesi, ozyeginUniversitesi, 
+       piriReisUniversitesi, sabanciUniversitesi, sankoUniversitesi, tedUniversitesi, 
+       tobbUniversitesi, torosUniversitesi, turkHavaKurumuUniversitesi, ufukUniversitesi, 
+       uskudarUniversitesi, yasarUniversitesi, yuksekIhtisasUniversitesi
+ 
+ 
+ 
+ 
     """+f"{general_system_ins}"
     fuel_price_system_ins = """
 You are a Fuel Price Analysis agent that will process the following  JSON data:

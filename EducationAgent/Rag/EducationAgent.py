@@ -61,6 +61,7 @@ DONT FORGET THAT ALL THESE JSON PAIRS ARE GOING TO BE FILLED FROM THE GIVEN CONT
         if isinstance(context, list):
             context = "\n".join(context)
         response = self.generate_response("Question:"+prompt+"Context:"+context)
+        print(response.text)
         return response.text
 
 

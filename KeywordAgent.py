@@ -118,8 +118,8 @@ def parse_keywords(prompt):
 def parse_university_keywords(prompt):
     parsed_keywords = parse_keywords(prompt)
     keyword_dictionary=json.loads(parsed_keywords)
-    print("University name(from Keyword Agent)"+keyword_dictionary["university_name"])
-    print("Department name(from Keyword Agent)"+keyword_dictionary["department"])
+    # print("University name(from Keyword Agent)"+keyword_dictionary["university_name"])
+    # print("Department name(from Keyword Agent)"+keyword_dictionary["department"])
     return keyword_dictionary
 
 
