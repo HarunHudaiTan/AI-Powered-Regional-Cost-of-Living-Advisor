@@ -8,7 +8,7 @@ import json
 
 class KeywordAgent(LLM_Agent):
     def __init__(self):
-        super().__init__("Keyword Agent", self.system_instructions, response_mime_type="application/json")
+        super().__init__("Keyword Agent", self.system_instructions, response_mime_type="application/json",temperature=0.1, top_p=0.3, top_k=20)
 
     system_instructions = """
     You are KeywordBot, an advanced AI designed to analyze natural language inputs and extract 
@@ -122,3 +122,6 @@ def parse_university_keywords(prompt):
     print("Department name(from Keyword Agent)"+keyword_dictionary["department"])
     return keyword_dictionary
 
+
+# response=parse_keywords("Snkara kiralık ev fiyat")
+# print(response)

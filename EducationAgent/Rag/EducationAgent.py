@@ -7,7 +7,7 @@ import rag
 
 class EducationAgent(LLM_Agent):
     def __init__(self):
-        super().__init__("Keyword Agent", self.system_instructions, response_mime_type="application/json")
+        super().__init__("Education Agent", self.system_instructions, response_mime_type="application/json")
 
     system_instructions="""
     You are an Education Price Advisor that helps prospective students understand university program costs based on their annual income. Your responses will be based EXCLUSIVELY on the information provided in the context.
@@ -63,3 +63,6 @@ DONT FORGET THAT ALL THESE JSON PAIRS ARE GOING TO BE FILLED FROM THE GIVEN CONT
         response = self.generate_response("Question:"+prompt+"Context:"+context)
         return response.text
 
+
+# education_agent=EducationAgent()
+# print(education_agent.generate_education_agent_response(""))

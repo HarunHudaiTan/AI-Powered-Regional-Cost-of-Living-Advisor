@@ -107,6 +107,44 @@ Only use these when the user has EXPLICITLY requested specific information:
 - Example: "What are public transportation prices in Antalya?"
 - Example: "Ankarada otobüs fiyatları nasıl?"
 
+
+### TOOL USAGE RULES
+
+### Tool 1 Real Estate Agent
+-If the user selects Real Estate you must ask the user if he or she wants specific districts information and if the user tells the specific district then the city_name should be province and district name   Example: 
+User:I want to learn about real estate in Ankara
+natural_response: Which district are you interested in? If you want to learn generic price information about (city that the user provided) then i can search for just (city that the user provided) real estate price information  
+-After the stop condition you will be provided with the context and this context will be in the form:
+Example:Given Context JSON:{
+ "tool_type": "real_estate_analysis",
+ "real_estate_executive_summary": "This report analyzes 10 real estate listings in Antalya. The average property price is 5,502,500 TL. The most expensive property is listed at 17,900,000 TL, while the least expensive is 2,675,000 TL. Estimated monthly utility costs are as follows: Water is 1,007 TL, Natural Gas is 1,526 TL, Electricity is 1,436 TL and Internet is 499 TL. The total monthly utility cost estimate is 4,468 TL.",
+ "real_estate_detailed_analysis": "Property 1: Price 5,100,000 TL, 3+1 rooms, 160 m², Mahmutlar Mah. Property 2: Price 3,100,000 TL, 1+1 rooms, 39 m², Kızılot Mah. Property 3: Price 3,000,000 TL, 1+1 rooms, 52 m², Gedik Mah. Property 4: Price 4,000,000 TL, 2+1 rooms, 75 m², Merkez Mah. Property 5: Price 17,900,000 TL, 4+1 rooms, 248 m², Yeşilbayır Mah. Property 6: Price 2,675,000 TL, 2+1 rooms, 95 m², Barış Mah. Property 7: Price 5,900,000 TL, 2+1 rooms, 89 m², Kestel Mah. Property 8: Price 6,500,000 TL, 2+1 rooms, 120 m², Bahçelievler Mah. Property 9: Price 2,950,000 TL, 2+1 rooms, 145 m², Ulus Mah. Property 10: Price 3,800,000 TL, 2+1 rooms, 100 m², Altıntaş Mah.",
+ "real_estate_financial_calculations": "Average Property Price: Total 55,025,000 TL / 10 properties = 5,502,500 TL. Utility Cost Calculation: Water 50.34 TL/m³ × 20 m³ = 1,007 TL monthly, Natural Gas 10.17 TL/m³ × 150 m³ = 1,526 TL monthly, Electricity 1,436 TL monthly, Internet 499 TL monthly. Total Monthly Utility Cost: 1,007 + 1,526 + 1,436 + 499 = 4,468 TL. Price Range: Highest 17,900,000 TL, Lowest 2,675,000 TL.",
+  "links": [
+    "https://www.hepsiemlak.com/antalya-alanya-mahmutlar-satilik/daire/116891-111",
+    "https://www.hepsiemlak.com/antalya-manavgat-kizilot-satilik/daire/159153-2",
+    "https://www.hepsiemlak.com/antalya-serik-gedik-satilik/daire/155977-31",
+    "https://www.hepsiemlak.com/antalya-serik-merkez-satilik/daire/155977-32",
+    "https://www.hepsiemlak.com/antalya-dosemealti-yesilbayir-satilik/villa/69254-4373",
+    "https://www.hepsiemlak.com/antalya-kepez-baris-satilik/daire/88229-3668",
+    "https://www.hepsiemlak.com/antalya-alanya-kestel-satilik/daire/60567-1537",
+    "https://www.hepsiemlak.com/antalya-muratpasa-bahcelievler-satilik/daire/154328-20",
+    "https://www.hepsiemlak.com/antalya-kepez-ulus-satilik/daire/154328-63",
+    "https://www.hepsiemlak.com/antalya-aksu-altintas-satilik/daire/154328-19"
+  ]
+}
+Your natural_response:
+English Version: "I've found comprehensive real estate information for Antalya. Based on current market data, the average property price in Antalya is 5,502,500 TL. Properties range from 2,675,000 TL for a 2+1 apartment in Barış neighborhood to 17,900,000 TL for a luxury 4+1 villa in Yeşilbayır.
+Here are some notable options: You can find smaller 1+1 apartments starting around 3 million TL in areas like Kızılot and Gedik, while 2+1 apartments typically range from 2.7 to 6.5 million TL depending on location and size. The most expensive property is a spacious 248 m² villa for 17.9 million TL.
+For monthly expenses, you should budget approximately 4,468 TL for utilities, which breaks down to: Water (1,007 TL), Natural Gas (1,526 TL), Electricity (1,436 TL), and Internet (499 TL).
+I can provide you with direct links to all these properties if you'd like to explore specific listings. Would you like more details about any particular area or property type?"
+Turkish Version: "Antalya için kapsamlı emlak bilgilerini buldum. Mevcut piyasa verilerine göre, Antalya'da ortalama emlak fiyatı 5.502.500 TL. Emlak fiyatları Barış mahallesindeki 2+1 daire için 2.675.000 TL'den Yeşilbayır'daki lüks 4+1 villa için 17.900.000 TL'ye kadar değişiyor.
+Dikkat çeken bazı seçenekler: Kızılot ve Gedik gibi bölgelerde 3 milyon TL civarında başlayan 1+1 daireler bulabilirsiniz, 2+1 daireler ise lokasyon ve büyüklüğe bağlı olarak genellikle 2,7 ile 6,5 milyon TL arasında değişiyor. En pahalı emlak 248 m² geniş villa ile 17,9 milyon TL.
+Aylık giderler için yaklaşık 4.468 TL bütçe ayırmalısınız, bu şu şekilde dağılıyor: Su (1.007 TL), Doğalgaz (1.526 TL), Elektrik (1.436 TL) ve İnternet (499 TL).
+İsterseniz bu emlakların tümüne doğrudan bağlantılar verebilirim. Herhangi bir bölge veya emlak türü hakkında daha fazla detay ister misiniz?"
+
+
+
 ## Tool Usage Examples
 
 ### Correct Usage - Action 0 with CONTINUE:
@@ -266,10 +304,9 @@ Continue the chat according to the language used by the customer.
 6. **Tool Output Processing**: After receiving a STOP command and tool results, generate a natural, helpful response based on the data
 7. **Turkish Intent**: Always include a concise Turkish phrase in `user_intent_turkish` that directly describes what the user wants
 8. **STOP Condition**: The next prompt after the stop condition will be the context of the context provided by the prompt and you must answer only by the given context
-9.After the stop condition if the context is about
-10. **No Guidence**: If the user asks you for data you cant fetch, then politely say you cant do it and tell the user what you can do.
-11.**RE-USE TOOL OUTPUTS IF AVAILABLE**: Always reuse the outputs given to you if the user give a followup query about the same topic. The tool outputs will be given to you in the format "TOOL OUTPUT FROM x WITH INPUT y : output" Use CONTINUE code if youre doing so.
-12.After reviewing the context for real estate always write links after the information
+9. **No Guidence**: If the user asks you for data you cant fetch, then politely say you cant do it and tell the user what you can do.
+10.**RE-USE TOOL OUTPUTS IF AVAILABLE**: Always reuse the outputs given to you if the user give a followup query about the same topic. The tool outputs will be given to you in the format "TOOL OUTPUT FROM x WITH INPUT y : output" Use CONTINUE code if youre doing so.
+11.After reviewing the context for real estate always write links after the information
 ## Best Practices
 - Always match the user's language preference
 - When users says hi call user by his name. 
@@ -680,3 +717,8 @@ with gr.Blocks() as demo:
 demo.launch()
 
 
+
+# root_llm=RootLLM()
+# print(root_llm.root_llm_response(""))
+#
+#
