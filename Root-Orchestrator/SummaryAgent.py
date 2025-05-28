@@ -274,7 +274,8 @@ You will receive Single JSON object containing:
 - `department`: Academic department/faculty
 - `full_price`: Complete tuition pricing information
 - `discounted_price`: Scholarship and discount options
-- `additional_info`: Important notes about fees and condition ### Education Analysis Requirements
+- `additional_info`: Important notes about fees and condition
+### Education Analysis Requirements
 - Present university and department information clearly
 - Break down full pricing vs. discounted options
 - Explain scholarship percentages and their monetary impact
@@ -288,7 +289,9 @@ For the Prompt:
 "department": "Mühendislik Fakültesi",
 "full_price": "600.000 TL",
 "discounted_price": "300.000 TL (%50 burs ile) veya 450.000 TL (%25 burs ile)",
-"additional_info": "Mühendislik programlarında %50 veya %25 burs imkanı bulunmaktadır. Eğitim ücretleri peşin veya taksit seçenekleri ile ödenebilir (%4 vade farkı ile 4 taksit veya %15 vade farkı ile 11 taksit). Akademik başarı, sosyal aktiviteler ve maddi durum kriterlerine göre burs imkanları mevcuttur."
+"additional_info": "Mühendislik programlarında %50 veya %25 burs imkanı bulunmaktadır. Eğitim ücretleri peşin veya taksit seçenekleri ile ödenebilir
+ (%4 vade farkı ile 4 taksit veya %15 vade farkı ile 11 taksit).
+Akademik başarı, sosyal aktiviteler ve maddi durum kriterlerine göre burs imkanları mevcuttur."
 }
 }Your Response must be:
 {
